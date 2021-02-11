@@ -1,0 +1,163 @@
+---
+title: "ashishsa_hw5_p1"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+We are going to use User Based Collaborative Filtering to filter the Users in the Movie Lense Data which is available in the Recommender Package.
+
+```{r}
+
+library(ggplot2)
+library(pander)
+library(caret)
+library(recommenderlab)
+data("MovieLense")
+d <- MovieLense
+```
+
+We now check the number of rows in the data.
+
+```{r}
+nrow(d)
+```
+
+We now check the number of columns in the data.
+
+```{r}
+ncol(d)
+```
+
+We now take a look at the list of the names of the Movies in the data.
+
+```{r}
+v1 <- as.vector(names(colCounts(MovieLense)))
+head(v1)
+```
+
+We now make a list and frequency of the ratings to analyze the number of ratings.
+Since there are 1664 movies and 943 users there should be a maximum of 1,569,152 ratings.
+
+```{r}
+ratings <- as.vector(MovieLense@data)
+table(ratings)
+```
+
+We observe from the above table that there are 1469760 zero ratings which means that there is only 37 Percent of the Ratings available. While there is 63 Percent of the Ratings Missing.
+We plot an Histogram to check the frequency and the number of ratings.
+
+```{r}
+non_zero_ratings <- ratings[ratings!=0]
+hist(non_zero_ratings)
+```
+
+We observe that most of the users have rated the movie between 3 and 5. With the maximum users giving a rating of 4 to the movie.
+
+We now create a Ratings Matrix from the MovieLense data by the following way.
+
+```{r}
+R <- as(MovieLense@data, "realRatingMatrix")
+l <- (getRatingMatrix(R)[1:10, 1:10])
+l
+```
+
+We now Normalize the Rating to remove the user bias. Since every user might overrateor underrate a movie based on his/her preferance.
+
+```{r}
+R_Normalize <- normalize(R)
+getRatingMatrix(R_Normalize)[1:10,1:10]
+```
+
+We now plot the image to observe the Un-Normalized ratings data.
+
+```{r}
+image(R, main = "Un-Normalized ratings")
+```
+
+The user ratings lie between 1-5.
+We now plot the image to observe the Normalized ratings data.
+
+```{r}
+image(R_Normalize, main = "Normalized ratings")
+```
+
+After Normalizing the ratings now lie between -4 to 4. This is done to remove any Bias in the data.
+We now plot the histogram to observe the Un-Normalized ratings data.
+
+```{r}
+hist(getRatings(R), breaks = 5, main = "Histogram of Un-Normalized ratings")
+```
+
+We now plot the histogram to observe the Normalized ratings data.
+
+```{r}
+hist(getRatings(R_Normalize), breaks = 5, main = "Histogram of normalized ratings")
+```
+
+After Normalizing the data the Ratings that existed between 0-5 now lie in the range -4 to +4. Mostof the ratings are in the range -2 to +2.
+
+```{r}
+hist(rowCounts(R_Normalize), breaks = 1664, main = "ratings given by users")
+```
+
+There are very few users who have given upards of 30 Ratings.
+
+```{r}
+hist(colCounts(R_Normalize), breaks = 934, main = "count of ratings per movie")
+```
+
+We now get the Movie Lense data Metadata which divides the movies into various Genres.
+
+```{r}
+moviemeta <- MovieLenseMeta
+head(moviemeta)
+```
+
+Since this is a large dataset that contains 945 Users and 1664 Movies, there might be users that have hardly rated any movies.
+
+In order to improve the ratings performance in the User Based Filtering, we divide the dataset into a set that contains the top 50 most rated movies and users that have rated upwards of 100 movies. As the number of movies rated increases, it will increase the probability of prediction of users that have similar tastes.  
+
+```{r}
+v2 <- R_Normalize[rowCounts(R_Normalize) > 100, colCounts(R_Normalize) > 50]
+
+image(v2)
+```
+
+From the image we can observe that most of the users have rated the movies. Unlike the Entire Data which showed a huge Empty space attributing to users with very low or no ratings.
+
+We now divide the dataset into train and test datasets 
+
+```{r}
+R_denormalize <- denormalize(R_Normalize)
+which_set <- sample(x = 1:5, size = nrow(R_denormalize), replace = TRUE)
+for(i_model in 1:5) 
+{
+  which_train <- which_set == i_model
+  data_test <- R_denormalize[which_train, ]
+  data_train <- R_denormalize[!which_train, ]
+}
+```
+
+
+We now apply the Recommender System on the subset dataset containing top 50 Most Rated Movies and a user-list containing top 100 Most Rated Users 
+
+```{r}
+recommender_popularity <- Recommender(data_train, method = "UBCF",parameter = list(method = "Cosine"))
+recommender_popularity
+```
+
+We now make a list of top 20 movies to most recommended users
+```{r}
+number_recommendation <- 20
+recommender_prediction1 <- predict(recommender_popularity,newdata=data_test,n=number_recommendation)
+recommender_prediction1
+```
+
+```{r}
+recdfub <- data.frame(user = sort(rep(1:length(recommender_prediction1@items), recommender_prediction1@n)), 
+    rating = unlist(recommender_prediction1@ratings), index = unlist(recommender_prediction1@items))
+head(recdfub)
+```
+
+The User Based Recommendation System uses the data available in the Train and Test Dataset to recommend the ratings of the movie not seen by using the top nearest users and recommend 20 movies and rate it by using the ratings of the nearest users.

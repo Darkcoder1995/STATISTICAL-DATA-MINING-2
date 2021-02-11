@@ -1,0 +1,385 @@
+---
+title: "ashishsa_hw5_p2"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(glasso)
+library(bestNormalize)
+library(cluster)
+library(ggplot2)
+library(ggdendro)
+library(dplyr)
+library(dendextend)
+library(ISLR)
+library(cluster)
+library(RColorBrewer)
+library(ape)
+library(fossil)
+library(kohonen)
+library(glasso)
+library(gRain)
+library(graph)
+library(corrplot)
+library(GGally)
+library(blob)
+library(AnnotationDbi)
+library(geneplotter)
+
+
+data("state.x77")
+df1 <- state.x77
+head(df1)
+```
+
+We are now going to cluster the states by performing Heirarchical Clustering with complete linkage and eucledian distance to cluster the states.
+
+```{r}
+nrow(df1)
+```
+
+We observe that there are 8 columns(Population, Income, Illiteracy, Life Exp, Murder, HS Grad, Frost, Area). There are 50 Rows here.
+
+```{r}
+pairs(df1)
+```
+
+We now scale the data
+```{r}
+m <- apply(df1,2,mean)
+s <- apply(df1,2,sd)
+z <- scale(df1,m,s)
+```
+
+We compute the Eucledian Distance between the data points and calculate the clusters using single,average and complete clusters.
+
+```{r include=FALSE}
+library(philentropy)
+dist1 <- dist(z,method="euclidean")
+hclust1 <- hclust(dist1,method="single")
+hclust2 <- hclust(dist1,method="average")
+hclust3 <- hclust(dist1,method="complete")
+```
+
+##ERROR RATES FOR VARIOUS METHODS OF HEIRARCHICAL CLUSTERING
+The plot that has the lowest error for the best k-value gives us the best result.
+
+```{r}
+store1 <- c()
+for (i in 2:10){
+  ct <- cutree(hclust1,k=i)
+  si <- silhouette(ct,dist = dist1)
+  avg_width <- summary(si)$avg.width
+  store1 <- c(store1,avg_width)
+}
+plot(store1)
+```
+
+```{r}
+store2 <- c()
+for (i in 2:10){
+  ct <- cutree(hclust2,k=i)
+  si <- silhouette(ct,dist = dist1)
+  avg_width <- summary(si)$avg.width
+  store2 <- c(store2,avg_width)
+}
+plot(store2)
+```
+
+```{r}
+library(ggplot2)
+store3 <- c()
+for (i in 2:10){
+  ct <- cutree(hclust3,k=i)
+  si <- silhouette(ct,dist = dist1)
+  avg_width <- summary(si)$avg.width
+  store3 <- c(store3,avg_width)
+}
+
+plot(store3)
+```
+
+From the above plots we can estimate that 
+
+1)single linkage has the error of 0.17 for k=4( which is estimated to be best cluster size)
+
+2)average linkage has the error of 0.33 for k=4( which is estimated to be best cluster size) 
+
+3)complete linkage has the error of 0.28 for k=4( which is estimated to be best cluster size)  
+
+We cluster the data using Single Linkage
+
+```{r fig.height = 10, fig.width = 15}
+
+dend1 <- as.dendrogram(hclust1)
+dend1 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+Incase of Single Linkage of Heirarchical Clustering we observe that there are a large number of clusters.
+We find the Minimal Inter-Cluster Similarity which is used to calculate the inter-cluster similarity.
+We now plot the clusters using Fan-Plot.
+
+```{r}
+cutree1 <- cutree(dend1,4)
+cutree1
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust1), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(4, 'Accent')[cutree1],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+As we can observe from the fan plot most of thee data gets clustered into the same class.
+
+##AVERAGE LINKAGE
+
+We cluster the data using Average Linkage.
+
+```{r fig.height = 10, fig.width = 15}
+
+dend2 <- as.dendrogram(hclust2)
+dend2 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+We compute Mean intercluster dissimilarity. Compute all pairwise dissimilarities between the observations in cluster A and the
+observations in cluster B, and record the average of these
+dissimilarities.
+
+```{r}
+cutree2 <- cutree(dend2,4)
+cutree2
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust2), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(4, 'Accent')[cutree2],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+As we can observe from the fan plot the data gets clustered into four classes.
+
+##COMPLETE LINKAGE
+
+We cluster the data using Complete Linkage.
+
+```{r fig.height = 10, fig.width = 15}
+dend3 <- as.dendrogram(hclust3)
+dend3 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+We compute Maximal intercluster dissimilarity. Compute all pairwise dissimilarities between the observations in cluster A and the
+observations in cluster B, and record the largest of these
+dissimilarities
+
+```{r}
+cutree3 <- cutree(dend3,4)
+cutree3
+```
+
+As we can observe from the fan plot the data gets clustered into three classes.
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust3), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(4, 'Accent')[cutree3],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+##RESULT
+
+From the Results of the Above Clustering we observe that the Heirarchical Clustering using Complete Linkage gives us the best results. The Cluster using the Single Linkage gives us the worst results (The tree is completely unbalanced) and the cluster uysing the Average Linkage gives us moderate results. The tree is relatively unbalanced in comparison to the complete linkage tree.
+
+
+
+
+##SOM
+```{r}
+training_data <- as.matrix(df1)
+```
+
+
+```{r}
+data_train_matrix <- training_data
+som_grid <- somgrid(xdim = 3, ydim=4, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=10000)
+```
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 20, fig.width = 15}
+coolBlueHotRed <- function(n,alpha=1){rainbow(n,end=4/6,alpha=alpha)[n:1]}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+We now plot all this Information onto a Grid. This further reinforcees the information provided by the above Heat Map.
+
+```{r fig.height = 10, fig.width = 15}
+plot(som_model,type="mapping")
+```
+
+
+This gives us the summary of the Self Organization Map.
+
+```{r}
+summary(som_model)
+```
+
+The codes give us the list of 16 different prototypes and the code books for all of the different prototypes.
+
+```{r fig.height = 10, fig.width = 15}
+som_model$codes
+```
+
+We now analyze the list of all the states and the prototypes that are closest to them.
+
+```{r}
+som_model$unit.classif
+```
+
+We now analyze the relative changes of the prototype code book vectors as we proceed through 200 different iteration.
+
+```{r}
+head(som_model$changes)
+```
+
+We observe that the changes start decreasing as we start increasing the number of iterations. A better understanding can be obtained from the Graph which represents the changes in the prototype. The things start converging as we move in the iteration.
+
+```{r fig.height = 10, fig.width = 15}
+plot(som_model,type="changes",main="STATE DATA")
+```
+
+We now plot the Codes plot which gives us the distribution of various crimes across various nodes.
+
+```{r fig.height = 20, fig.width = 15}
+plot(som_model,type = "codes")
+```
+
+
+We now plot the distance to the Neighbours between each states that are plotted into a particular node.
+
+```{r fig.height = 10, fig.width = 15}
+plot(som_model,type="dist.neighbours")
+```
+
+We now plot the componenet plane plots. Which Visualizes the original data over the SOM that we have created.
+
+```{r fig.height = 10, fig.width = 15}
+codes <- som_model$codes[[1]]
+
+som_model$data <- data.frame(som_model$data)
+for (i in 1:8){
+  plot(som_model, type = "property", property = codes[,i], main=names(som_model$data)[i],palette.name=coolBlueHotRed)
+  }
+```
+We find the distance using the SOM_Model codes and observe a clear distinction between the height of the dendrogram between the 2 clusters. This helps us find the point for the cutoff and also helps us easily cluster the dat into 3 distinct groups which was difficult in the case of Plain Heirarchical Clustering using Eucledian Distance.
+
+```{r fig.height = 10, fig.width = 15}
+d <- dist(codes)
+hc <- hclust(d)
+plot(hc)
+```
+
+We now plot the SOM amd specify the cutoff point at a location where we can observe the approximate cutoff in the Dendrogram plotted above.
+
+By specifying the cutoff point obtained from the plot above and clustering the data at that height gives us the approximate distribution of the data into 4 clusters.
+
+```{r fig.height = 10, fig.width = 15}
+som_cluster <- cutree(hc,k=4)
+# plot these results:
+my_pal <- c("red","blue","yellow","green") 
+my_bhcol <- my_pal[som_cluster]
+
+{plot(som_model,type="mapping",col="black",bgcol = my_bhcol)
+  add.cluster.boundaries(som_model,som_cluster)}
+```
+
+
+##GAUSSIAN GRAPHICAL MODEL
+
+```{r fig.height = 10, fig.width = 15}
+M <- cor(df1)
+corrplot(M)
+```
+
+We observe from the corrplot that Murder and Life Expectency are Negatively correlated. So we remove one of these variables.
+
+We also take a look at the distribution of the data given below.
+
+```{r fig.height = 10, fig.width = 15}
+df1_1 <- as.data.frame(z)
+ggpairs(df1_1, title="correlogram with ggpairs()")
+```
+
+We observe that the data is relatively gaussian and we now remove Murder.
+
+```{r}
+dats <- z[,-5]
+```
+
+```{r fig.height = 10, fig.width = 15}
+fit_pca <- prcomp(dats)
+xlim_1 <- min(fit_pca$x[,1])-1
+xlim_2 <- max(fit_pca$x[,1])+1
+ylim_1 <- min(fit_pca$x[,2])-1
+ylim_2 <- max(fit_pca$x[,2])+1
+
+biplot(fit_pca,choices = c(1,2),scale = 0,xlim=c(xlim_1,xlim_2),ylim=c(ylim_1,ylim_2))
+```
+
+We observe from the Biplot that Alaska, California and Texas are outliers and needs to be removed.
+
+```{r}
+new_dats <- dats[-c(2,5,43),]
+```
+
+Now we take a look at the partial correlation
+```{r}
+part1 <- cov.wt(new_dats, method="ML")
+PC.body <- cov2pcor(part1$cov)
+diag(PC.body) <- 0
+```
+
+```{r fig.height = 10, fig.width = 15}
+heatmap(PC.body)
+```
+
+```{r}
+S <- part1$cov
+m0.lasso <- glasso(S,rho=0.1)
+my_edges <- m0.lasso$wi!=0
+diag(my_edges) <- 0
+g.lasso <- as(my_edges,"graphNEL")
+nodes(g.lasso) <- colnames(new_dats)
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(g.lasso)
+```
+
+```{r}
+my_rhos <- c(0.1,0.2,0.3,0.4,0.5,0.6)
+m0.lasso <- glassopath(S,rho=my_rhos)
+for(i in 1:length(my_rhos)){
+  my_edges <- m0.lasso$wi[ , , i]!= 0
+  diag(my_edges) <- 0
+  g.lasso <- as(my_edges,"graphNEL")
+  nodes(g.lasso)<-colnames(new_dats)
+  
+  plot(g.lasso)
+}
+```
+
+The Gaussian Graphical Models consider the Principal Components of the data to cluster the data. It uses the covariance and the partial covariance to cluster the data while the Heirarchical Cluster uses the Linkage distance to cluster the factors. The Gaussian Graphical Model can generally map the cause while Hclust is generally used to map the Result. Due to the nature of the mechanism of Gaussian Graphical Models are highly affected by the Skewedness of the data. The data needs to be Normalised before use. Otherwise the Gaussian Graphical Model is unable to cluster the data accurately. Heirarchical cluster is better than the Gaussian Graphical Model in this respect. It is not adversely affected by the nature of distribution of data.

@@ -1,0 +1,546 @@
+---
+title: "ashishsa_hw4_p1"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(network)
+library(igraphdata)
+library(igraph)
+library(GGally)
+library(ape)
+library(ggraph)
+library(tidyverse)
+```
+##KARATE DATASET
+
+We begin with making a network for the karate.We fit the karate dataset to the Heirarchical Random Graph.
+```{r}
+data(karate)
+ghrg <- fit_hrg(karate)
+```
+
+We plot the Karate Dataset on a Graph and check the layout. 
+```{r fig.height = 15, fig.width = 15}
+ggraph(ghrg,layout="lgl")+
+  geom_edge_link(width=0.2,colour="grey")+
+  geom_node_point(col="black",size=0.3)+
+  theme_graph()
+```
+
+We observe a pattern containg single edge.
+We now plot a Dendrogram to show the layout and the extent of the network.
+
+```{r fig.height = 70, fig.width = 70}
+ggraph(ghrg, layout = 'dendrogram', circular = FALSE) + 
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+
+
+we now extract the edge list from the graph. Then we make a random list that contains indices of 95 percent of the edge list. So we have essentially deleted 5 percent of the edge list. Now we make a new list of the edges that conatins the edgelist of the 95 percent edges. We keep a track of the edges that are deleted in the variable diff which contains the list of edges that were deleted. 
+
+```{r}
+d1 <- data.frame(as_edgelist(karate))
+random_list <- sample(0.95*nrow(d1),)
+new_list <- data.frame(d1[random_list,])
+
+rows.in.a1.that.are.not.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.without.a2.rows <- a1[!a1.vec %in% a2.vec,]
+    return(a1.without.a2.rows)
+}
+
+diff <- rows.in.a1.that.are.not.in.a2(d1,new_list)
+head(diff,5)
+```
+
+Now we convert the new_list into a matrix then we make a new graph from this edge list. We now fit this graph to a heirarchical random graph.
+
+```{r}
+g <- as.matrix(new_list)
+g2 <- graph_from_edgelist(g)
+ghrg1 <- fit_hrg(g2)
+```
+
+We now plot this new heirarchical graph.
+
+```{r fig.height = 40, fig.width = 70}
+ggraph(ghrg1, layout = 'dendrogram', circular = FALSE) +
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+We now predict the missing edges in the graph g2. Now we compare the effect of predict function by calculating the difference in the predicted edges and the diff list. 
+
+```{r}
+pred <- predict_edges(g2)
+
+rows.in.a1.that.are.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.with.a2.rows <- a1[a1.vec %in% a2.vec,]
+    return(a1.with.a2.rows)
+}
+
+diff2 <- rows.in.a1.that.are.in.a2(diff,pred$edges)
+```
+
+Now the difference in the length of the list gives us the accuracy of the prediction.
+
+```{r}
+acc1 <- 100*((nrow(diff)-nrow(diff2))/nrow(diff)) 
+acc1
+```
+
+##YEAST DATASET
+
+We begin with making a network for the Yeast.We fit the yeast dataset to the Heirarchical Random Graph.
+```{r}
+data(yeast)
+ghrg <- fit_hrg(yeast)
+```
+
+We plot the Yeast Dataset on a Graph and check the layout. 
+```{r fig.height = 15, fig.width = 15}
+ggraph(ghrg,layout="lgl")+
+  geom_edge_link(width=0.2,colour="grey")+
+  geom_node_point(col="black",size=0.3)+
+  theme_graph()
+```
+
+We observe a complex pattern which is also entangled with multiple loops along with few networks containg single edge.
+We now plot a Dendrogram to show the layout and the extent of the network.
+
+```{r fig.height = 190, fig.width = 70}
+ggraph(ghrg, layout = 'dendrogram', circular = FALSE) + 
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+By zooming in we can make out the approximate structure of the graph. But it is not very intuitive due to the size and the complexity of the network.
+
+we now extract the edge list from the graph. Then we make a random list that contains indices of 95 percent of the edge list. So we have essentially deleted 5 percent of the edge list. Now we make a new list of the edges that conatins the edgelist of the 95 percent edges. We keep a track of the edges that are deleted in the variable diff which contains the list of edges that were deleted. 
+
+```{r}
+d1 <- data.frame(as_edgelist(yeast))
+random_list <- sample(0.95*nrow(d1),)
+new_list <- data.frame(d1[random_list,])
+
+rows.in.a1.that.are.not.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.without.a2.rows <- a1[!a1.vec %in% a2.vec,]
+    return(a1.without.a2.rows)
+}
+
+diff <- rows.in.a1.that.are.not.in.a2(d1,new_list)
+```
+
+Now we convert the new_list into a matrix then we make a new graph from this edge list. We now fit this graph to a heirarchical random graph.
+
+```{r}
+g <- as.matrix(new_list)
+g2 <- graph_from_edgelist(g)
+ghrg1 <- fit_hrg(g2)
+```
+
+We now plot this new heirarchical graph.
+
+```{r}
+ggraph(ghrg1, layout = 'dendrogram', circular = FALSE) +
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+We now predict the missing edges in the graph g2. Now we compare the effect of predict function by calculating the difference in the predicted edges and the diff list. 
+
+```{r}
+
+pred <- predict_edges(g2)
+
+rows.in.a1.that.are.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.with.a2.rows <- a1[a1.vec %in% a2.vec,]
+    return(a1.with.a2.rows)
+}
+
+diff2 <- rows.in.a1.that.are.in.a2(diff,pred$edges)
+```
+
+Now the difference in the length of the list gives us the accuracy of the prediction.
+
+```{r}
+acc1 <- 100*((nrow(diff)-nrow(diff2))/nrow(diff)) 
+acc1
+```
+
+
+
+##15 PERCENT KARATE DATASET
+
+We begin with making a network for the karate.We fit the karate dataset to the Heirarchical Random Graph.
+```{r}
+data(karate)
+ghrg <- fit_hrg(karate)
+```
+
+we now extract the edge list from the graph. Then we make a random list that contains indices of 85 percent of the edge list. So we have essentially deleted 15 percent of the edge list. Now we make a new list of the edges that conatins the edgelist of the 85 percent edges. We keep a track of the edges that are deleted in the variable diff which contains the list of edges that were deleted. 
+
+```{r}
+d1 <- data.frame(as_edgelist(karate))
+random_list <- sample(0.85*nrow(d1),)
+new_list <- data.frame(d1[random_list,])
+
+rows.in.a1.that.are.not.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.without.a2.rows <- a1[!a1.vec %in% a2.vec,]
+    return(a1.without.a2.rows)
+}
+
+diff <- rows.in.a1.that.are.not.in.a2(d1,new_list)
+head(diff,5)
+```
+
+Now we convert the new_list into a matrix then we make a new graph from this edge list. We now fit this graph to a heirarchical random graph.
+
+```{r}
+g <- as.matrix(new_list)
+g2 <- graph_from_edgelist(g)
+ghrg1 <- fit_hrg(g2)
+```
+
+We now plot this new heirarchical graph.
+
+```{r fig.height = 40, fig.width = 70}
+ggraph(ghrg1, layout = 'dendrogram', circular = FALSE) +
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+We now predict the missing edges in the graph g2. Now we compare the effect of predict function by calculating the difference in the predicted edges and the diff list. 
+
+```{r}
+
+pred <- predict_edges(g2)
+
+rows.in.a1.that.are.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.with.a2.rows <- a1[a1.vec %in% a2.vec,]
+    return(a1.with.a2.rows)
+}
+
+diff2 <- rows.in.a1.that.are.in.a2(diff,pred$edges)
+```
+
+Now the difference in the length of the list gives us the accuracy of the prediction.
+
+```{r}
+acc1 <- 100*((nrow(diff)-nrow(diff2))/nrow(diff)) 
+acc1
+```
+
+##15 PERCENT YEAST DATASET
+
+We begin with making a network for the Yeast.We fit the yeast dataset to the Heirarchical Random Graph.
+```{r}
+data(yeast)
+ghrg <- fit_hrg(yeast)
+```
+
+We plot the Yeast Dataset on a Graph and check the layout. 
+```{r fig.height = 15, fig.width = 15}
+ggraph(ghrg,layout="lgl")+
+  geom_edge_link(width=0.2,colour="grey")+
+  geom_node_point(col="black",size=0.3)+
+  theme_graph()
+```
+
+We observe a complex pattern which is also entangled with multiple loops along with few networks containg single edge.
+We now plot a Dendrogram to show the layout and the extent of the network.
+
+```{r fig.height = 190, fig.width = 70}
+ggraph(ghrg, layout = 'dendrogram', circular = FALSE) + 
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+By zooming in we can make out the approximate structure of the graph. But it is not very intuitive due to the size and the complexity of the network
+
+we now extract the edge list from the graph. Then we make a random list that contains indices of 85 percent of the edge list. So we have essentially deleted 5 percent of the edge list. Now we make a new list of the edges that conatins the edgelist of the 85 percent edges. We keep a track of the edges that are deleted in the variable diff which contains the list of edges that were deleted. 
+
+```{r}
+d1 <- data.frame(as_edgelist(yeast))
+random_list <- sample(0.85*nrow(d1),)
+new_list <- data.frame(d1[random_list,])
+
+rows.in.a1.that.are.not.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.without.a2.rows <- a1[!a1.vec %in% a2.vec,]
+    return(a1.without.a2.rows)
+}
+
+diff <- rows.in.a1.that.are.not.in.a2(d1,new_list)
+```
+
+Now we convert the new_list into a matrix then we make a new graph from this edge list. We now fit this graph to a heirarchical random graph.
+
+```{r}
+g <- as.matrix(new_list)
+g2 <- graph_from_edgelist(g)
+ghrg1 <- fit_hrg(g2)
+```
+
+We now plot this new heirarchical graph.
+
+```{r}
+ggraph(ghrg1, layout = 'dendrogram', circular = FALSE) +
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+We now predict the missing edges in the graph g2. Now we compare the effect of predict function by calculating the difference in the predicted edges and the diff list. 
+
+```{r}
+
+pred <- predict_edges(g2)
+
+rows.in.a1.that.are.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.with.a2.rows <- a1[a1.vec %in% a2.vec,]
+    return(a1.with.a2.rows)
+}
+
+diff2 <- rows.in.a1.that.are.in.a2(diff,pred$edges)
+```
+
+Now the difference in the length of the list gives us the accuracy of the prediction.
+
+```{r}
+acc1 <- 100*((nrow(diff)-nrow(diff2))/nrow(diff)) 
+acc1 
+```
+
+
+##40 PERCENT KARATE DATASET
+
+We begin with making a network for the karate.We fit the karate dataset to the Heirarchical Random Graph.
+```{r}
+data(karate)
+ghrg <- fit_hrg(karate)
+```
+
+we now extract the edge list from the graph. Then we make a random list that contains indices of 60 percent of the edge list. So we have essentially deleted 40 percent of the edge list. Now we make a new list of the edges that conatins the edgelist of the 60 percent edges. We keep a track of the edges that are deleted in the variable diff which contains the list of edges that were deleted. 
+
+```{r}
+d1 <- data.frame(as_edgelist(karate))
+random_list <- sample(0.60*nrow(d1),)
+new_list <- data.frame(d1[random_list,])
+
+rows.in.a1.that.are.not.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.without.a2.rows <- a1[!a1.vec %in% a2.vec,]
+    return(a1.without.a2.rows)
+}
+
+diff <- rows.in.a1.that.are.not.in.a2(d1,new_list)
+head(diff,5)
+```
+
+Now we convert the new_list into a matrix then we make a new graph from this edge list. We now fit this graph to a heirarchical random graph.
+
+```{r}
+g <- as.matrix(new_list)
+g2 <- graph_from_edgelist(g)
+ghrg1 <- fit_hrg(g2)
+```
+
+We now plot this new heirarchical graph.
+
+```{r fig.height = 40, fig.width = 70}
+ggraph(ghrg1, layout = 'dendrogram', circular = FALSE) +
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+We now predict the missing edges in the graph g2. Now we compare the effect of predict function by calculating the difference in the predicted edges and the diff list. 
+
+```{r}
+
+pred <- predict_edges(g2)
+
+rows.in.a1.that.are.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.with.a2.rows <- a1[a1.vec %in% a2.vec,]
+    return(a1.with.a2.rows)
+}
+
+diff2 <- rows.in.a1.that.are.in.a2(diff,pred$edges)
+```
+
+Now the difference in the length of the list gives us the accuracy of the prediction.
+
+```{r}
+acc1 <- 100*((nrow(diff)-nrow(diff2))/nrow(diff)) 
+acc1
+```
+
+
+##40 PERCENT YEAST DATASET
+
+We begin with making a network for the Yeast.We fit the yeast dataset to the Heirarchical Random Graph.
+```{r}
+data(yeast)
+ghrg <- fit_hrg(yeast)
+```
+
+We plot the Yeast Dataset on a Graph and check the layout. 
+```{r fig.height = 15, fig.width = 15}
+ggraph(ghrg,layout="lgl")+
+  geom_edge_link(width=0.2,colour="grey")+
+  geom_node_point(col="black",size=0.3)+
+  theme_graph()
+```
+
+We observe a complex pattern which is also entangled with multiple loops along with few networks containg single edge.
+We now plot a Dendrogram to show the layout and the extent of the network.
+
+```{r fig.height = 190, fig.width = 70}
+ggraph(ghrg, layout = 'dendrogram', circular = FALSE) + 
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+By zooming in we can make out the approximate structure of the graph. But it is not very intuitive due to the size and the complexity of the network
+
+we now extract the edge list from the graph. Then we make a random list that contains indices of 60 percent of the edge list. So we have essentially deleted 5 percent of the edge list. Now we make a new list of the edges that conatins the edgelist of the 40 percent edges. We keep a track of the edges that are deleted in the variable diff which contains the list of edges that were deleted. 
+
+```{r}
+d1 <- data.frame(as_edgelist(yeast))
+random_list <- sample(0.60*nrow(d1),)
+new_list <- data.frame(d1[random_list,])
+
+rows.in.a1.that.are.not.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.without.a2.rows <- a1[!a1.vec %in% a2.vec,]
+    return(a1.without.a2.rows)
+}
+
+diff <- rows.in.a1.that.are.not.in.a2(d1,new_list)
+```
+
+Now we convert the new_list into a matrix then we make a new graph from this edge list. We now fit this graph to a heirarchical random graph.
+
+```{r}
+g <- as.matrix(new_list)
+g2 <- graph_from_edgelist(g)
+ghrg1 <- fit_hrg(g2)
+```
+
+We now plot this new heirarchical graph.
+
+```{r}
+ggraph(ghrg1, layout = 'dendrogram', circular = FALSE) +
+  geom_edge_link() +
+  geom_node_point(color="#69b3a2", size=3) +
+  geom_node_text(aes( label=name, filter=leaf), angle=0, hjust=1, nudge_y=0.1) +
+  geom_node_point(aes(filter=leaf) , alpha=0.6) + ylim(-.6, NA) +
+  theme(legend.position="none")+
+  coord_flip() +
+  scale_y_reverse()
+```
+
+We now predict the missing edges in the graph g2. Now we compare the effect of predict function by calculating the difference in the predicted edges and the diff list. 
+
+```{r}
+
+pred <- predict_edges(g2)
+
+rows.in.a1.that.are.in.a2  <- function(a1,a2)
+{
+    a1.vec <- apply(a1, 1, paste, collapse = "")
+    a2.vec <- apply(a2, 1, paste, collapse = "")
+    a1.with.a2.rows <- a1[a1.vec %in% a2.vec,]
+    return(a1.with.a2.rows)
+}
+
+diff2 <- rows.in.a1.that.are.in.a2(diff,pred$edges)
+```
+
+Now the difference in the length of the list gives us the accuracy of the prediction.
+
+```{r}
+acc1 <- 100*((nrow(diff)-nrow(diff2))/nrow(diff)) 
+acc1 
+```
+
+
+
