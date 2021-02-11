@@ -1,0 +1,5 @@
+[0412/041509.821:WARNING:minidump_to_upload_parameters.cc(36)] duplicate key guid, discarding value 797c293d-3959-4a50-a42c-3fd0ec7be71b
+[0430/173906.309:ERROR:minidumpwritedump_with_crashpad_info.cc(435)] Failed to call MiniDumpWriteDump: Not enough memory resources are available to process this command. (0x80070008)
+[0430/173906.312:ERROR:minidumpwritedump_with_crashpad_info.cc(562)] Failed to write minidump file
+[0430/173906.312:ERROR:crash_report_exception_handler.cc(128)] TryMiniDumpWriteDumpWithCrashpadInfo failed
+[0430/173906.321:ERROR:process_info.cc(359)] UncheckedAllocate

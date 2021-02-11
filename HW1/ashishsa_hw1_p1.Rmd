@@ -1,0 +1,343 @@
+---
+title: "ashishsa_hw_p1"
+output:
+  pdf_document: default
+  html_document: default
+---
+We initially consider the following Utility Matrix
+```{r}
+library(knitr)
+a <- c(4,NA,2)
+b <- c(5,3,NA)
+c <- c(NA,4,1)
+d <- c(5,3,3)
+e <- c(1,1,NA)
+f <- c(NA,2,4)
+g <- c(3,1,5)
+h <- c(2,NA,3)
+df <- data.frame(a,b,c,d,e,f,g,h)
+```
+Here we represent the missing values with NA.
+```{r}
+df
+```
+We now rename the rows in R.
+```{r}
+rownames(df) <- c('A','B','C')
+df
+```
+We now need to calculate the Jacard and cosine distance between users by considering the utility matrix as Boolean.
+So Initially we convert the utility matrix into Boolean
+```{r}
+df[df>0] <- 1
+df[df<=0] <- 0
+df[is.na(df)] <- 0
+df
+```
+
+We have now converted the Utility Matrix into Binary Utility Matrix. Now we calculate the Jackard Distance.
+
+##JACCARD DISTANCE
+
+This can Manually be calculated as:
+
+The Jaccard Index (between any two columns/users of the matrix M) is a/a+b+c, where:
+
+a = number of rows where both columns are 1
+
+b = number of rows where the first row is 0 and the other row is 1
+
+c = number of rows where the first row is 1 and the other row is 0
+
+Now we calculate the Jaccard distance between (A,B) and (A,C):
+
+Jaccard Distance between A,B:
+
+a=4
+
+b=2
+
+c=2
+
+J_AB=[4/(4+2+2)]
+
+J_AB=[1/2]
+
+
+Jaccard Distance between A,C:
+
+a=4
+
+b=2
+
+c=2
+
+J_AC=[4/(4+2+2)]
+
+J_AC=[1/2]
+
+##COSINE DISTANCE
+
+COSINE DISTANCE=1-COSINE SIMILARITY
+
+COSINE SIMILARITY=(A.B)/||A||.||B||
+
+##Cosine Distance between A,B:
+
+A.B= (1*0)+(1*1)+(0*1)+(1*1)+(1*1)+(0*1)+(1*1)+(1*0)
+
+A.B=(0+1+0+1+1+0+1+0)
+
+A.B=4
+
+||A||=(1*1)+(1*1)+(0*0)+(1*1)+(1*1)+(0*0)+(1*1)+(1*1)
+
+||A||=6
+
+||B||=(0*0)+(1*1)+(1*1)+(1*1)+(1*1)+(1*1)+(1*1)+(0*0)
+
+||B||=6
+
+COSINE SIMILARITY=4/(6*6)
+
+COSINE SIMILARITY=4/36
+
+COSINE DISTANCE=1-(4/36)
+
+COSINE DISTANCE==32/36
+
+##Cosine Distance between A,C:
+
+A.C= (1*1)+(1*0)+(0*1)+(1*1)+(1*0)+(0*1)+(1*1)+(1*1)
+
+A.C=(1+0+0+1+0+0+1+1)
+
+A.C=4
+
+||A||=(1*1)+(1*1)+(0*0)+(1*1)+(1*1)+(0*0)+(1*1)+(1*1)
+
+||A||=6
+
+||C||=(1*1)+(0*0)+(1*1)+(1*1)+(0*0)+(1*1)+(1*1)+(1*1)
+
+||C||=6
+
+COSINE SIMILARITY=4/(6*6)
+
+COSINE SIMILARITY=4/36
+
+COSINE DISTANCE=1-(4/36)
+
+COSINE DISTANCE==32/36
+
+
+##Now we consider that 3,4,5 are 1 and 1,2 are 0:
+```{r}
+library(knitr)
+a <- c(4,NA,2)
+b <- c(5,3,NA)
+c <- c(NA,4,1)
+d <- c(5,3,3)
+e <- c(1,1,NA)
+f <- c(NA,2,4)
+g <- c(3,1,5)
+h <- c(2,NA,3)
+df <- data.frame(a,b,c,d,e,f,g,h)
+df[df<=2] <- 0
+df[df>=3] <- 1
+df[is.na(df)] <- 0
+df
+```
+
+We have now converted the Utility Matrix into Binary Utility Matrix. Now we calculate the Jackard Distance.
+
+##JACCARD DISTANCE
+
+This can Manually be calculated as:
+The Jaccard Index (between any two columns/users of the matrix M) is a/a+b+c, where:
+
+a = number of rows where both columns are 1
+
+b = number of rows where the first row is 0 and the other row is 1
+
+c = number of rows where the first row is 1 and the other row is 0
+
+Now we calculate the Jaccard distance between (A,B) and (A,C):
+
+Jaccard Distance between A,B:
+
+a=2
+
+b=1
+
+c=2
+
+J_AB=[2/(2+1+2)]
+
+J_AB=[2/5]
+
+
+Jaccard Distance between A,C:
+
+a=2
+
+b=2
+
+c=2
+
+J_AC=[2/(2+2+2)]
+
+J_AC=[2/6]
+##COSINE DISTANCE
+
+COSINE DISTANCE=1-COSINE SIMILARITY
+
+COSINE SIMILARITY=(A.B)/||A||.||B||
+
+##Cosine Distance between A,B:
+A.B= (1*0)+(1*1)+(0*1)+(1*1)+(0*0)+(0*0)+(1*0)+(0*0)
+
+A.B=(0+1+0+1+0+0+0+0)
+
+A.B=2
+
+||A||=(1*1)+(1*1)+(0*0)+(1*1)+(0*0)+(0*0)+(1*1)+(0*0)
+
+||A||=4
+
+||B||=(0*0)+(1*1)+(1*1)+(1*1)+(0*0)+(0*0)+(0*0)+(0*0)
+
+||B||=3
+
+COSINE SIMILARITY=2/(4*3)
+
+COSINE SIMILARITY=2/12
+
+COSINE DISTANCE=1-(2/12)
+
+COSINE DISTANCE==10/12
+
+##Cosine Distance between A,C:
+A.C= (1*0)+(1*0)+(0*0)+(1*1)+(0*0)+(0*1)+(1*1)+(0*1)
+
+A.C=(0+0+0+1+0+0+1+0)
+
+A.C=2
+
+||A||=(1*1)+(1*1)+(0*0)+(1*1)+(0*0)+(0*0)+(1*1)+(0*0)
+
+||A||=4
+
+||C||=(0*0)+(0*0)+(0*0)+(1*1)+(0*0)+(1*1)+(1*1)+(1*1)
+
+||C||=4
+
+COSINE SIMILARITY=2/(4*4)
+
+COSINE SIMILARITY=2/16
+
+COSINE DISTANCE=1-(2/16)
+
+COSINE DISTANCE==14/16
+
+Normalize the matrix by subtracting from each nonblank entry the average value
+for its user. Using this matrix, compute the cosine distance between each pair of
+users. 
+
+We initially consider the following Utility Matrix
+```{r}
+library(knitr)
+a <- c(4,NA,2)
+b <- c(5,3,NA)
+c <- c(NA,4,1)
+d <- c(5,3,3)
+e <- c(1,1,NA)
+f <- c(NA,2,4)
+g <- c(3,1,5)
+h <- c(2,NA,3)
+df <- data.frame(a,b,c,d,e,f,g,h)
+```
+
+```{r}
+A <- c(4,5,NA,5,1,NA,3,2)
+B <- c(NA,3,4,3,1,2,1,NA)
+C <- c(2,NA,1,3,NA,4,5,3)
+
+mean_A <- mean(A,na.rm = TRUE)
+mean_A
+```
+
+
+```{r}
+mean_B <- mean(B,na.rm = TRUE)
+mean_B
+```
+
+
+```{r}
+mean_C <- mean(C,na.rm = TRUE)
+mean_C
+```
+
+Now substracting mean from every value in df we get:
+```{r}
+A <- c(1,2,NA,2,-2,NA,0,-1)
+B <- c(NA,1,2,1,-1,0,-1,NA)
+C <- c(-1,NA,-2,0,NA,1,2,0)
+```
+
+##COSINE DISTANCE
+
+COSINE DISTANCE=1-COSINE SIMILARITY
+
+COSINE SIMILARITY=(A.B)/||A||.||B||
+
+we consider na as 0
+##Cosine Distance between A,B:
+
+A.B= (1*0)+(2*1)+(0*2)+(2*1)+(-2*-1)+(0*0)+(0*-1)+(-1*0)
+
+A.B=(0+2+0+2+2+0+0+0)
+
+A.B=6
+
+||A||=(1*1)+(2*2)+(0*0)+(2*2)+(-2*-2)+(0*0)+(0*0)+(-1*-1)
+
+||A||=14
+
+||B||=(0*0)+(1*1)+(2*2)+(1*1)+(-1*-1)+(0*0)+(-1*-1)+(0*0)
+
+||B||=8
+
+COSINE SIMILARITY=6/(14*8)
+
+COSINE SIMILARITY=2/112
+
+COSINE DISTANCE=1-(2/112)
+
+COSINE DISTANCE==110/112
+
+##Cosine Distance between A,C:
+A.C= (1*0)+(1*0)+(0*0)+(1*1)+(0*0)+(0*1)+(1*1)+(0*1)
+
+A.C=(0+0+0+1+0+0+1+0)
+
+A.C=2
+
+||A||=(1*1)+(2*2)+(0*0)+(2*2)+(-2*-2)+(0*0)+(0*0)+(-1*-1)
+
+||A||=14
+
+
+||C||=(-1*-1)+(0*0)+(-2*-2)+(0*0)+(0*0)+(1*1)+(2*2)+(0*0)
+
+||C||=10
+
+COSINE SIMILARITY=2/(14*10)
+
+COSINE SIMILARITY=2/140
+
+COSINE DISTANCE=1-(2/140)
+
+COSINE DISTANCE==138/140
+

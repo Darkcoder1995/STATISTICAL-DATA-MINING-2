@@ -1,0 +1,619 @@
+---
+title: "ashishsa_hw1_p2"
+output:
+  html_document: default
+  pdf_document: default
+---
+ We first take a look at the Boston Housing Dataset.
+```{r}
+library(MASS)
+data(Boston)
+df1 <- Boston
+head(df1)
+```
+For Market Basket Analysis using Apriori Algorithm its essential that all the variables that are continuous get converted into categorical. From the initial Observation we observe that crim,zn,indus,nox,rm,age,dis,tax,ptratio,black,lstat,medv are continuous variable which needs to be converted into categorical variables.
+We first compare the effect of various variables that effect medv.
+Also we check the effect of variables on each other by using the correlation plot. This tells us the effect of variables on each other.
+```{r}
+library(GGally)
+ggcorr(df1,title="CORRELATION--PLOT")
+```
+
+Now After a basic pre-eliminary analysis of the dataset we now convert the dataset into a list for further operation.
+
+```{r}
+Boston_list <- as(Boston,"list")
+library(qboxplot)
+```
+
+Now we check the histogram values for every variable and then use the information to convert the continuous variable to categorical variable.
+
+```{r}
+hist(df1$crim)
+```
+
+We observe that here in variable crim that most of the neighbourhoods have crime rates between 0-10 crimes and the extreme cases of high amounts of crimes in neighbourhoods that is the crime rates exceeding 30 crimes are very very low that is less than 1 to 5 neighbourhoods.
+
+```{r}
+b1 <- boxplot(df1$crim,
+main = "CRIME RATE IN BOSTON",
+xlab = "CRIME RATE",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+We now check for the probability of crime rates using the Boxplot and Quantile function
+```{r}
+quantile(Boston$crim,probs = c(0,0.25,0.75,0.9,1))
+```
+
+```{r}
+Boston[["crim"]] <- 
+ordered(cut(df1[["crim"]],c(0.006,0.083,3.67 ,10.75,88.97)),labels=c("Low-crim","Middle-crim","High-crim","Super-crim"))
+```
+
+```{r}
+hist(df1$zn)
+```
+
+
+We observe here in variable zn that most of the neighbourhoods have between 0-10 lots and more than 10 lots are found in very very few neighbourhoods.
+
+```{r}
+b1 <- boxplot(df1$zn,
+main = "LOTS IN BOSTON",
+xlab = "NUMBER OF LOTS IN BOSTON",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+We now check for the probability of Number Of Lots using the Boxplot and Quantile function
+```{r}
+quantile(Boston$zn,probs = c(0,0.75,0.85,0.95,1))
+```
+
+```{r}
+Boston[["zn"]] <- ordered(cut(Boston$zn,c(0.0,12.5,28.0,80.0,100.0)),labels=c("no-lot","low-lot","middle-lot","high-lot"))
+```
+
+
+```{r}
+hist(df1$indus)
+``` 
+
+We observe that most of neighbourhoods have between 18-20 non-retail buisness acres in most of the neighbourhood and also a lot of neighbourhoods have less than 10 non-retail buisness acres and also more than 20 buisness acres are very few in number.
+
+We now check for the proportion of non-retail business acres per town using the Boxplot and Quantile function.
+
+```{r}
+b1 <- boxplot(df1$indus,
+main = "INDUS RATE IN BOSTON",
+xlab = "PROP OF NON-RETAIL BUSINESS ACRES PER TOWN",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+```{r}
+quantile(Boston$indus,probs = c(0,0.25,0.75,0.9,1))
+```
+
+```{r}
+Boston[["indus"]] <- 
+ordered(cut(df1[["indus"]],c(0.46,5.19,18.10 ,19.58,27.74)),labels=c("Low-indus","Middle-indus","High-indus","Super-indus"))
+```
+
+
+```{r}
+hist(df1$chas)
+```
+
+We observe that most of the neighbourhoods do not track Charles River and very few neighbourhoods track Charles River.
+
+We now check for the proportion of Neighbourhoods that track the Charles River.
+
+```{r}
+b1 <- boxplot(df1$chas,
+main = "CHAS IN BOSTON",
+xlab = "CHARLES RIVER",
+ylab = "NO OF NEIGHBOURHOOD",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+Boston[["chas"]] <- ordered(Boston$chas,labels=c("off-river","near-river"))
+```
+
+```{r}
+hist(df1$nox)
+```
+
+We observe that most of neighbourhoods have between 0.4-0.6 percentage of Nitric Oxide Concentration and also neighbourhoods on an average have Nitric Oxide Concentration between 0.6-0.8 percentage and very few neighbourhoods have more than 0.9 percentage of Nitric Oxide Concentration.
+
+We now check for the proportion of nitric oxides concentration.
+```{r}
+b1 <- boxplot(df1$nox,
+main = "NOX IN BOSTON",
+xlab = "NITRIC OXIDE CONCENTRATION",
+ylab = "NO OF NEIGHBOURHOOD",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+quantile(Boston$nox,probs = c(0,0.25,0.75,0.9,1))
+```
+
+
+
+```{r}
+Boston[["nox"]] <- 
+ordered(cut(df1[["nox"]],c(0.385,0.449,0.624,0.713,0.871)),labels=c("Low-nox","Middle-nox","High-nox","Super-noxs"))
+```
+
+
+
+```{r}
+hist(df1$rm)
+```
+
+We observe that most of the neighbourhoods have between 6-7 rooms and there are more number of neighbourhoods that have more than 7 rooms than neighbourhoods with less than 5 rooms.
+
+We now check for the average number of rooms per dwelling.
+```{r}
+b1 <- boxplot(df1$rm,
+main = "ROOMS IN BOSTON",
+xlab = "PROPORTION OF ROOMS",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+```{r}
+quantile(Boston$rm,probs = c(0,0.25,0.75,0.9,1))
+```
+
+
+```{r}
+Boston[["rm"]] <- 
+ordered(cut(df1[["rm"]],c(3,5,7,9)),labels=c("small-house","Middle-house","big-house"))
+```
+
+
+```{r}
+hist(df1$age)
+```
+
+We observe that there are a very few units which are new but most of the units are over a 100 years old. There is an almost equivallent distribution of units that are aged between 20 to 80 years old.
+
+We now check for the proportion of owner-occupied units built prior to 1940.
+```{r}
+b1 <- boxplot(df1$age,
+main = "AGE OF UNITS IN BOSTON",
+xlab = "AGE OF UNITS",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+```{r}
+quantile(Boston$age,probs = c(0,0.10,0.25,0.40,1))
+```
+
+
+
+```{r}
+Boston[["age"]] <- 
+ordered(cut(df1[["age"]],c(3,27,46,65,100)),labels=c("Young", "Middle-aged", "Senior", "Elderly"))
+```
+
+
+```{r}
+hist(df1$dis)
+```
+
+
+We observed that maximum number of units have very low amount of distance between the units to Boston Employment Centers while most of the centres have an average distance between 3 to 8 miles. Again very few units are situated far away from the Boston Employment Center.   
+
+We now check for the proportion of weighted distances to five Boston employment centres.
+```{r}
+b1 <- boxplot(df1$dis,
+main = "DIST TO BOSTON EMPLOYEMENT CENTRE",
+xlab = "DISTANCE TO EMP CENTRE",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+```{r}
+quantile(Boston$dis,probs = c(0,0.60,0.85,0.99,1))
+```
+
+
+```{r}
+Boston[["dis"]] <- 
+ordered(cut(df1[["dis"]],c(1,4,7,10,12)),labels=c("Low-dis","Middle-dis","High-dis","Super-dis"))
+```
+
+
+```{r}
+hist(df1$rad)
+```
+
+We observed that maximum number of units have very low amount of distance between the units to Radial Highway. There are also a large number of units which are situated far away from the Radial Highway which might either indicate there is an .
+
+We now check for the proportion of weighted distances to five Boston employment centres.
+```{r}
+b1 <- boxplot(df1$rad,
+main = "ACCESSIBILITY TO RADIAL HIGHWAYS",
+xlab = "ACCESSIBILITY TO RADIAL HIGHWAYS",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+quantile(Boston$rad,probs = c(0,0.25,0.5,0.70,1))
+```
+
+
+```{r}
+Boston[["rad"]] <- 
+ordered(cut(df1[["rad"]],c(1,4,5,8,24)),labels=c("Low-index","Middle-index","High-index","Super-index"))
+```
+
+```{r}
+hist(df1$tax)
+```
+
+We observe that most of the units have a full value property tax between 0 to 450 dollars. while there are very few units that have tax rates between 450 to 650 and also a large number of units have a tax rate larger than 700 dollars.
+
+We now check for the proportion of full-value property-tax rate per $10,000
+```{r}
+b1 <- boxplot(df1$tax,
+main = "TAX RATE IN BOSTON",
+xlab = "PROPERTY TAX RATE",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+quantile(Boston$tax,probs = c(0,0.25,0.70,0.9,1))
+```
+
+
+
+```{r}
+Boston[["tax"]] <- 
+ordered(cut(df1[["tax"]],c(187,279,500,711)),labels=c("Low-tax","Middle-tax","High-tax"))
+```
+
+
+```{r}
+hist(df1$ptratio)
+```
+
+We observe that most of the units in Boston has a pupil-teacher ratio of 20-21. The Average pupil-teacher ratio is between 14-20.
+
+
+We now check for the proportion of pupil-teacher ratio by town.
+```{r}
+b1 <- boxplot(df1$ptratio,
+main = "PTRATIO IN BOSTON",
+xlab = "PTRATIO",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+quantile(Boston$ptratio,probs = c(0,0.25,0.75,0.9,1))
+```
+
+
+
+```{r}
+Boston[["ptratio"]] <- 
+ordered(cut(Boston[["ptratio"]],c(12.6,17.4,20.2,22)),labels=c("Low-ptratio","Middle-ptratio","High-ptratio"))
+```
+
+
+```{r}
+hist(df1$black)
+```
+
+Most of the neighbourhoods have between 350-400 Black citizens in Boston.
+
+We now check for the proportion of blacks by town.
+```{r}
+b1 <- boxplot(df1$black,
+main = "BLACK POPULATION IN BOSTON",
+xlab = "BLACK POPULATION",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+quantile(Boston$black,probs = c(0,0.06,0.11,1))
+```
+
+
+
+```{r}
+Boston[["black"]] <- 
+ordered(cut(Boston[["black"]],c(0,100,300,400)),labels=c("Low-black","Middle-black","High-black"))
+```
+
+
+```{r}
+hist(df1$lstat)
+```
+
+The maximum frequency of population belong to 5-25 percentage of lower population.
+
+We now check for the proportion of lower status of the population
+```{r}
+b1 <- boxplot(df1$lstat,
+main = "LSTAT IN BOSTON",
+xlab = "% of lower status of the population",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+quantile(Boston$lstat,probs = c(0,0.45,0.75,0.9,1))
+```
+
+
+
+```{r}
+Boston[["lstat"]] <- 
+ordered(cut(Boston[["lstat"]],c(1,10,20,40)),labels=c("Low-lstat","Middle-lstat","High-lstat"))
+```
+
+```{r}
+hist(df1$medv)
+```
+
+
+The maximum frequency of units have a Median value of owner occupied homes between 0-25.
+
+We now check for the proportion of Median value of owner-occupied homes in $1000's
+
+```{r}
+b1 <- boxplot(df1$medv,
+main = "MEDV IN BOSTON",
+xlab = "Median value of owner-occupied homes",
+ylab = "NO OF NEIGHBOURHOODS",
+col = "orange",
+border = "brown",
+horizontal = TRUE,
+notch = FALSE
+)
+```
+
+
+
+```{r}
+quantile(Boston$medv,probs = c(0,0.25,0.75,0.9,1))
+```
+
+
+
+```{r}
+Boston[["medv"]] <- 
+ordered(cut(Boston[["medv"]],c(0,15,25,40,55)),labels=c("Low-value","Middle-value","High-value","super-value"))
+```
+
+We need to transform the data into Binary Incidence Matrix. This Binary Incidence Matrix helps us to find the important relationship between various variables in the dataset.
+```{r }
+library(arules)
+Boston_data <- as(Boston,"transactions")
+summary(Boston_data)
+```
+We need to visualize the data using the item Frequency Plot. We visualize the data in the descending order of support. Inorder to see how variables are getting added as the support decreases.
+```{r}
+itemFrequencyPlot(Boston_data,support=0.9,cex.name=0.8)
+```
+
+```{r}
+itemFrequencyPlot(Boston_data,support=0.7,cex.name=0.8)
+```
+
+```{r}
+itemFrequencyPlot(Boston_data,support=0.5,cex.name=0.8)
+```
+
+```{r}
+itemFrequencyPlot(Boston_data,support=0.2,cex.name=0.8)
+```
+
+```{r}
+itemFrequencyPlot(Boston_data,support=0.1,cex.name=0.8)
+```
+
+```{r}
+itemFrequencyPlot(Boston_data,support=0,cex.name=0.8)
+```
+We now use Apriori Algorithm to find the rules that affect the effects of each variable on one another.
+```{r}
+rules <- apriori(Boston_data,parameter = list(support=0.02,confidence=0.1))
+```
+We now look at the summary of the data.
+```{r}
+summary(rules)
+```
+
+We now use the rules generated using the Apriori Algorithm to find the low crime areas which are as close to the city as possible.
+ 
+These rules gives us valuable insight into the association rules that are associated with the decisions to find the areas close to city and also having low crimes. 
+```{r}
+Lowcrime_rules<-subset(rules,subset = lhs %in% "dis=Low-dis" & rhs %in% "crim=Low-crim" & lift>1)
+```
+
+We observe that there are 350 rules that affect it.
+
+```{r}
+Lowcrime_rules
+```
+
+To advise the student we take a look at the top 5 association rules that affect the decision that needs to be taken to stay as cloase as the city as possible while having the lowest crime.
+```{r}
+inspect(head(sort(Lowcrime_rules, by = "confidence"), n = 5))
+```
+
+We now use the rules generated using the Apriori Algorithm to find the schools with low pupil teacher ratio which are as close to the city as possible.
+ 
+These rules gives us valuable insight into the association rules that are associated with the decisions to find the schools with low student-pupil ratio.
+
+```{r}
+Lowptratio_rules <- subset(rules,subset=rhs %in% "ptratio=Low-ptratio" & lift > 1)
+```
+
+We observe that there are 7049 rules that affect it.
+
+```{r}
+Lowptratio_rules
+```
+
+To advise the student we take a look at the top 5 association rules that affect the decision that needs to be taken to find schools having the lowest pupil-teacher ratio.
+
+```{r}
+inspect(head(sort(Lowptratio_rules, by = "confidence"), n = 5))
+```
+
+
+We now use Regression to find the results and compare the results of Association Rules using Apriori Algorithm.
+
+We first find the 
+```{r}
+library(caret)
+library(MASS)
+data(Boston)
+#View(Boston)
+set.seed(123)
+
+amount_division <- createDataPartition(Boston$medv, p=2/3,list=FALSE)
+
+training_dataset <- Boston[amount_division,]
+
+#training_dataset <- as.matrix(training_dataset[,-11])
+
+Y_training_dataset <- Boston$ptratio[amount_division]
+
+testing_dataset <- Boston[-amount_division,]
+
+Y_testing_dataset <- testing_dataset$ptratio
+
+#testing_dataset <- as.matrix(testing_dataset[,-11])
+
+grid = 10 ^ seq(-3 , 3 , length = 100)
+
+Training_Parameters <- trainControl(method = "cv" , 
+                                   number = 5 , 
+                                   savePredictions = TRUE,
+                                   verboseIter = TRUE)
+#nrow(training_dataset)
+#View(training_dataset)
+df1 <- as.data.frame(training_dataset)
+
+Ridge_Model <- train(ptratio~., 
+                     data = df1 , 
+                     method = "glmnet" , 
+                     trControl = Training_Parameters , 
+                     tuneGrid = data.frame(alpha = 0 , lambda = grid))
+```
+
+
+```{r}
+Ridge_Model$bestTune
+#View(Ridge_Model$coefnames)
+```
+
+
+```{r}
+Predict_Ridge_Model1 = predict(Ridge_Model, newdata = testing_dataset, s=Ridge_Model$bestTune)
+Predict_Ridge_Model1
+```
+
+
+```{r}
+actuals_preds <- data.frame(cbind(actuals=testing_dataset$ptratio, predicteds=Predict_Ridge_Model1))
+head(actuals_preds)
+```
+
+
+```{r}
+correlation_accuracy <- cor(actuals_preds)
+correlation_accuracy
+```
+
+
+```{r}
+linear_information <- postResample(Predict_Ridge_Model1 , testing_dataset$ptratio)
+linear_information
+```
+
+
+We observe here that the accuracy is better in case of treee based methods incase of Regression. Although the results are comparable. 
+Regression is used to prediction of the data while apriori is primarily used to create the rules and get the information on which combinations are better to get the result.

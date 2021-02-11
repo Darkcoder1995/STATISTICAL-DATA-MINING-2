@@ -1,0 +1,148 @@
+---
+title: "ashishsa_hw1_p3"
+output: html_document
+---
+
+We have to Cluster the Demographic Data using a Classification Tree. First we load the data and we first check the data using head.
+
+```{r}
+rm(list=ls(all=T)) 
+library(loadr)
+load("C:/Users/ashis/OneDrive/Desktop/New folder (2)/HW1/ElemStatLearn/data/marketing.RData")
+head(marketing)
+View(marketing)
+```
+
+We need to create a Reference Dataset which has the same size as the Training set. We first check the number of rows in the dataset.
+
+```{r}
+nrow(marketing)
+ncol(marketing)
+```
+
+We first need to check if there are NAN values present in the dataset.
+We find if NaN values are present in theparticular column then we replace those NaN values with column means.
+```{r}
+library(tidyr)
+col_means <- lapply(marketing, mean, na.rm = TRUE)
+data1 <- replace_na(marketing, col_means)
+```
+
+Now we make the Reference Dataset by finding the range of each column in the dataset.We find the minimum and maximum values of each column in the dataset.
+
+```{r}
+Income_max <- max(data1$Income)
+Income_min <- min(data1$Income)
+Sex_max <- max(data1$Sex)
+Sex_min <- min(data1$Sex)
+Marital_max <- max(data1$Marital)
+Marital_min <- min(data1$Marital)
+Age_max <- max(data1$Age)
+Age_min <- min(data1$Age)
+Edu_max <- max(data1$Edu)
+Edu_min <- min(data1$Edu)
+Occupation_max <- max(data1$Occupation)
+Occupation_min <- min(data1$Occupation)
+Lived_max <- max(data1$Lived)
+Lived_min <- min(data1$Lived)
+Dual_Income_max <- max(data1$Dual_Income)
+Dual_Income_min <- min(data1$Dual_Income)
+Household_max <- max(data1$Household)
+Household_min <- min(data1$Household)
+Householdu_max <- max(data1$Householdu18)
+Householdu_min <- min(data1$Householdu18)
+Status_max <- max(data1$Status)
+Status_min <- min(data1$Status)
+Hometype_max <- max(data1$Home_Type)
+Hometype_min <- min(data1$Home_Type)
+Ethnic_max <- max(data1$Ethnic)
+Ethnic_min <- min(data1$Ethnic)
+Language_max <- max(data1$Language)
+Language_min <- min(data1$Language)
+```
+
+We now create new variables using the max and min function.
+
+```{r}
+Income <- sample(rep(Income_min:Income_max,len=8993))
+Sex <- sample(rep(Sex_min:Sex_max,len=8993))
+Marital <- sample(rep(Marital_min:Marital_max,len=8993))
+Age <- sample(rep(Age_min:Age_max,len=8993))
+Edu <- sample(rep(Edu_min:Edu_max,len=8993))
+Occupation <- sample(rep(Occupation_min:Occupation_max,len=8993))
+Lived <- sample(rep(Lived_min:Lived_max,len=8993))
+Dual_Income <- sample(rep(Dual_Income_min:Dual_Income_max,len=8993))
+Household <- sample(rep(Household_min:Household_max,len=8993))
+Householdu18 <- sample(rep(Householdu_min:Householdu_max,len=8993))
+Status <- sample(rep(Status_min:Status_max,len=8993))
+Home_Type <- sample(rep(Hometype_min:Hometype_max,len=8993))
+Ethnic <- sample(rep(Ethnic_min:Ethnic_max,len=8993))
+Language <- sample(rep(Language_min:Language_max,len=8993))
+```
+
+We now make a data frame for the Reference Sample from the variables created above. 
+
+```{r}
+reference_sample <- data.frame(Income,Sex,Marital,Age,Edu,Occupation,Lived,Dual_Income,Household,Householdu18,Status,Home_Type,Ethnic,Language)
+```
+
+We now take the original dataset as the training dataset and the generated dataset as the reference dataset.We also combine both the dataset.
+
+```{r}
+reference_sample$target <-  0
+training_sample <- data1
+training_sample$target <-  1
+accombined_data <- rbind(reference_sample,training_sample)
+View(accombined_data)
+```
+
+We convert the variables as factors.
+
+```{r}
+accombined_data$Sex <- as.factor(as.character(accombined_data$Sex))
+accombined_data$Marital <- as.factor(as.character(accombined_data$Marital))
+accombined_data$Occupation <- as.factor(as.character(accombined_data$Occupation))
+accombined_data$Dual_Income <- as.factor(as.character(accombined_data$Dual_Income))
+accombined_data$Home_Type <- as.factor(as.character(accombined_data$Home_Type))
+accombined_data$Ethnic <- as.factor(as.character(accombined_data$Ethnic))
+accombined_data$Language <- as.factor(as.character(accombined_data$Language))
+accombined_data$Status <- as.factor(as.character(accombined_data$Status))
+accombined_data$target <- as.factor(as.character(accombined_data$target))
+```
+
+Now we use rpart to cluster the data
+
+```{r}
+library(caret)
+library(e1071)
+library(rpart.plot)
+trcntrl <- trainControl(method="repeatedcv",number=10,repeats=3)
+
+cluster_tree <- train(target~.,data=accombined_data,method="rpart",parms=list(split="information"),trControl=trcntrl,tuneLength=10)
+```
+
+How we take a look at the summary of the trees.
+
+```{r}
+cluster_tree
+```
+
+Now we visualize the Tree.
+
+```{r}
+prp(cluster_tree$finalModel,box.palette = "Blues", tweak = 1.2)
+```
+
+As we can see from the following visualization, the left nodes of the tree contain the target class 0 while the right nodes contain the target class1 which shows that the tree has clustered the data as per the target class.
+
+```{r}
+predicted <- predict(cluster_tree,accombined_data[,-c(15)])
+head(predicted)
+```
+
+```{r}
+confusionMatrix(predicted,accombined_data[,c(15)])
+```
+
+
+

@@ -1,0 +1,276 @@
+---
+title: "ashishsa_hw3_p2"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+We first read the US Arrests Data.
+
+```{r}
+library(ISLR)
+library(philentropy)
+library(ggdendro)
+library(dplyr)
+library(dendextend)
+library(ggplot2)
+library(dendextend)
+library(kohonen)
+data("USArrests")
+df1 <- USArrests
+head(df1)
+```
+
+We scale the data first to avoid large values to skew the analysis.
+
+```{r}
+m <- apply(df1,2,mean)
+s <- apply(df1,2,sd)
+z <- scale(df1,m,s)
+```
+
+We perform Heirarchical Clustering using Complete Linkages and Eucledian Distance as a measure of distance.
+
+```{r}
+dist1 <- dist(z,method="euclidean")
+hclust1 <- hclust(dist1,method='complete')
+```
+
+We create a Dendrogram from the Heirarchical Cluster.
+
+```{r fig.height = 10, fig.width = 15}
+dend1 <- as.dendrogram(hclust1)
+dend1 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+As we can observe from the plot the data is partitioned into 4 groups at the same level.
+
+We first try to cluster the Dendrogram into 3 groups and use k=3 to cluster the data into 3 groups.
+
+```{r}
+cutree2 <- cutree(dend1,k=3)
+cutree2
+```
+
+We now try to cluster the Dendrogram into 3 groups by cutting at an appropriate height. We observe that it clusters into 2 groups at a height of 4.5 and it clusters into 4 groups at a height of 4.4.
+
+```{r}
+cutree1 <- cutree(dend1,h=4.4)
+cutree1
+```
+
+By manually comparing the values we can infer that the Dendrogram cannot actually be divided into 3 clusters by a clear break a the 2 main groups cut into 4 groups at the same height. 
+
+The function k=3 actually divides the cluster into 3 groups by dividing the cluster in a way that 2 groups cluster as 1 group(That is groups 3,4 clusters into group3) and 1 group clusters into 2(That is groups 1,2).
+
+This can be visually confirmed by the following Dendrogram where 2 entires sub group clusters into the Red Group, while 2 more groups are formed that is groups Blue and Green.
+
+```{r fig.height = 10, fig.width = 15}
+dend <- z %>% dist %>%
+  hclust %>% as.dendrogram %>%
+  set("branches_k_color", k = 3) %>% set("branches_lwd", 0.7) %>%
+  set("labels_cex", 0.6) %>% set("labels_colors", k = 3) %>%
+  set("leaves_pch", 19) %>% set("leaves_cex", 0.5) 
+ggd1 <- as.ggdend(dend)
+ggplot(ggd1, horiz = TRUE)
+```
+
+```{r}
+training_data <- as.matrix(z)
+```
+
+We need to apply SOM to the data and we know that the size of SOM is given by 5*sqrt(N)
+Here N is the number of observation. So to break it down, If Columns are your feature and each row is one observation then Number of Nodes = 5 * sqrt (# of Rows * # of columns).
+
+We observe that there are 50 Rows and 4 Columns. So the Number Of Observations can be summed up as: 
+
+```{r}
+nr <- nrow(df1)
+nc <- ncol(df1)
+s_lower <- 0.25*sqrt((nr*nc))
+s_lower
+```
+
+```{r}
+s_upper <- 4*sqrt((nr*nc))
+s_upper
+```
+
+We observe that the nearest square less than 56 is obtaiuned by dim=7. Here the feature map derives the size of 49=>(Xdim=7*Ydim=7).
+So we create a SOM having x and y dimension as 7.
+```{r}
+data_train_matrix <- training_data
+som_grid <- somgrid(xdim = 7, ydim=7, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=10000)
+```
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 20, fig.width = 15}
+coolBlueHotRed <- function(n,alpha=1){rainbow(n,end=4/6,alpha=alpha)[n:1]}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+
+As we can observe here there are too many states that donot map into different units we reduce the grid size to reduce the number of unnecessary nodes.
+
+```{r}
+som_grid <- somgrid(xdim = 6, ydim=6, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=10000)
+```
+
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 20, fig.width = 15}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+As we can observe there are still units that donot map to any state. We further reduce the size of the SOM Map.
+
+```{r}
+som_grid <- somgrid(xdim = 5, ydim=5, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=10000)
+```
+
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 20, fig.width = 15}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+Although the number of states getting mapped to the plot increases there are still instances when there are empty nodes in the map and to avoid it we further reduce the size of the SOM Map.
+
+```{r}
+som_grid <- somgrid(xdim = 4, ydim=4, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=10000)
+```
+
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 20, fig.width = 15}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+We now plot all this Information onto a Grid. This further reinforcees the information provided by the above Heat Map.
+
+```{r}
+plot(som_model,type="mapping")
+```
+
+
+This gives us the summary of the Self Organization Map.
+
+```{r}
+summary(som_model)
+```
+
+The codes give us the list of 16 different prototypes and the code books for all of the different prototypes.
+
+```{r fig.height = 10, fig.width = 15}
+som_model$codes
+```
+
+We now analyze the list of all the states and the prototypes that are closest to them.
+
+```{r}
+som_model$unit.classif
+```
+
+We now analyze the relative changes of the prototype code book vectors as we proceed through 200 different iteration.
+
+```{r}
+head(som_model$changes)
+```
+
+We observe that the changes start decreasing as we start increasing the number of iterations. A better understanding can be obtained from the Graph which represents the changes in the prototype. The things start converging as we move in the iteration.
+
+```{r fig.height = 10, fig.width = 15}
+plot(som_model,type="changes",main="CRIME DATA")
+```
+
+We now plot the Codes plot which gives us the distribution of various crimes across various nodes.
+
+```{r fig.height = 20, fig.width = 15}
+plot(som_model,type = "codes")
+```
+
+
+We now plot the distance to the Neighbours between each states that are plotted into a particular node.
+
+```{r fig.height = 10, fig.width = 15}
+plot(som_model,type="dist.neighbours")
+```
+
+We now plot the componenet plane plots. Which Visualizes the original data over the SOM that we have created.
+
+```{r fig.height = 10, fig.width = 15}
+codes <- som_model$codes[[1]]
+
+som_model$data <- data.frame(som_model$data)
+for (i in 1:4){
+  plot(som_model, type = "property", property = codes[,i], main=names(som_model$data)[i],palette.name=coolBlueHotRed)
+  }
+```
+We find the distance using the SOM_Model codes and observe a clear distinction between the height of the dendrogram between the 2 clusters. This helps us find the point for the cutoff and also helps us easily cluster the dat into 3 distinct groups which was difficult in the case of Plain Heirarchical Clustering using Eucledian Distance.
+
+```{r}
+d <- dist(codes)
+hc <- hclust(d)
+plot(hc)
+```
+
+We now plot the SOM amd specify the cutoff point at a location where we can observe the approximate cutoff in the Dendrogram plotted above.
+
+By specifying the cutoff point obtained from the plot above and clustering the data at that height gives us the approximate distribution of the data into 3 clusters.
+
+```{r}
+som_cluster <- cutree(hc,h=3.7)
+# plot these results:
+my_pal <- c("red","blue","yellow") 
+my_bhcol <- my_pal[som_cluster]
+
+{plot(som_model,type="mapping",col="black",bgcol = my_bhcol)
+  add.cluster.boundaries(som_model,som_cluster)}
+```
+
+
+Comparison Of Heirarchical Clustering To Self Organization Map.
+
+Heirarchical CLustering:
+1) Heirarchical CLustering works by finding the measure of similarity between the data points and then correlating the data points based on Heirarchy.
+2) It works well on Data that have Heirarchical Structure and we want to recover this Heirarchy.
+3) It doesnot work well on Non Heirarchical or continuous data.
+4) It is more imformative than K-Means or any such algorithm in that it doesnot return a flat cluster as in kmeans or other forms of Clustering Analysis.
+5) It is Flexible with respect to proximity measure and can use many measures to visualize and evaluate its Results.
+5) It is helpful in being able to visualize the data in the form of Dendrogram and also helps us divide the data into various clusters by using cuttree. We can also cluster and cut the data not only by the height but also by specifying the number of clusters that we want the data to be divided into.
+6) Heirarchical clustering can basically be summarized as a non-iterative single step Greedy Algorithm which happens to be its major drawback as being greedy we can optimize the current step's task but we cannot guarentee the best partition in the future.
+7) Incase there is a Non-Heirarchical Data or a Semi Heirarchical Data with not clear Heirarchy the Algorithm doesnot provide Best Results.
+8) Missing Data causes the Heirarchical Cluster to fail.
+9) A lot of decisions are arbitrary and there is no strong decision.
+10) Incase a data is assigned to a given cluster we cannot go back and apply the instance to another cluster even though it might suite the other cluster better.
+11) Not suitable for Very Very Large Dataset.
+12) Order of Data and also Initial seeds have Impact on Results.
+13) Sensitive to outliers. So need to scale data repeatedly.
+
+Self Organization Map:
+1) SOM can be summarized as basically a Neural Netowrk that maps a High Dimensional Input Data to a two dimsional Ouput space.
+2) It consists of Nodes (2-D Rectangular or Hexagonal Grids). These units represents certain vectors in the data space that can be initialized. Vectors from dataset are presented to map in Random Order. The unit with the highest response to chosen vector is declared winner and the neighbourhood units are adapted to be more responsive to the present unit. Eucledian or other Gaussian Distance measures are used to determine neighbourhood. The neighbourhood function is declined during training as well as learning rate adapts to overall process.
+3) It doesnot build a Generative Model for the data.
+4) It relies on predefined distance in feature space.
+5) Not Intuitive without visualizing using other tools like Dendrogram.
+6) Doesnot work well for categorical Data and even worst for Mixed Data.
+7) Useful For Analysing Large Non intuitive data having cut points at the same / similar level. Hence widely used in Gene Mapping / Financial Data. 
+8) It is a Black Box process where the weights generated to map the SOM to the feature space is not very intuitively understandable to the user.
+9) The nearby points should behave in a similar sense. Because the SOM tries to map the neighbourhood feature space in a way similar to the present feature. Hence Categorical data cannot be mappped as effectively.
+10) Maps/ Clusters very large dataset with eese.
+
+
+Comparison:
+1) Hclust works well on Categorical Data.
+2) SOM works well on Continuous Data.
+3) Hclust Not Very Good to categorize very large, complex clusters as using Eucledian distnce causes loss of generality, data.
+4) SOM Maps complex data very well as using the concept of Neural Networks it generates a feature space that maps the original data very well which can be used to further classify datasets. 
+2) Hclust used to visualize clusters.
+5) SOM used for Dimensionality Reduction and mapping large dimension to 2-D space.

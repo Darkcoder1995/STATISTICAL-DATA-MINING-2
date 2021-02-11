@@ -1,0 +1,265 @@
+---
+title: "ashishsa_hw3_p1"
+output:
+  pdf_document: default
+  html_document: default
+---
+We need to analyze the tumor micro array data from the Elements Of Statistical Learning. It has 14 subtypes of tumor cells. We need to use the SOM Algorithm to cluster the data into multiple groups.
+```{r}
+library(kohonen)
+library(Umatrix)
+library(dplyr)
+library(ggplot2)
+library(ape)
+library(dendextend)
+library(RColorBrewer)
+library(scales)
+df1 <- read.csv('nci.data.csv',sep=",",row.names=1,header = TRUE)
+```
+
+We first scale the data.
+
+```{r}
+EigenValues <- eigen(cov(scale(df1)))
+EigenValues$values
+
+```
+
+
+```{r}
+m <- apply(df1,2,mean)
+s <- apply(df1,2,sd)
+z <- scale(df1,m,s)
+```
+
+Now we turn the data into a matrix so that we can pass the data to the SOM Algorithm.
+```{r}
+training_data <- as.matrix(z)
+```
+
+We need to apply SOM to the data and we know that the size of SOM is given by 5*sqrt(N)
+Here N is the number of observation. So to break it down, If Columns are your feature and each row is one observation then Number of Nodes = 5 * sqrt (# of Rows * # of columns).
+
+We observe that there are 6830 Rows and 64 Columns. So the Number Of Observations can be summed up as: 
+
+```{r}
+nr <- nrow(z)
+nc <- ncol(z)
+s_lower <- 0.25*sqrt((nr*nc))
+s_lower
+```
+
+```{r}
+s_upper <- 4*sqrt((nr*nc))
+s_upper
+```
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 20, fig.width = 15}
+coolBlueHotRed <- function(n,alpha=1){rainbow(n,end=4/6,alpha=alpha)[n:1]}
+```
+
+```{r}
+data_train_matrix <- training_data
+```
+
+```{r}
+som_grid <- somgrid(xdim = 10, ydim = 10, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=1000)
+```
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 15, fig.width = 15}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+We now plot the SOM amd specify the cutoff point at a location where we can observe the approximate cutoff in the Dendrogram plotted above.
+
+By specifying the cutoff point obtained from the plot above and clustering the data at that height gives us the approximate distribution of the data into 3 clusters.
+
+```{r fig.height = 15, fig.width = 15}
+codes <- som_model$codes[[1]]
+d <- dist(codes)
+hc <- hclust(d)
+som_cluster <- cutree(hc,k=14)
+# plot these results:
+my_pal <- (hue_pal()(14))
+my_bhcol <- my_pal[som_cluster]
+
+{plot(som_model,type="mapping",col="black",bgcol = my_bhcol)
+  add.cluster.boundaries(som_model,som_cluster)}
+```
+
+```{r}
+show_col(my_pal)
+```
+
+From the counts plot we had inferred that there are upwards of 300 Genes that are plotted to a given node in SOM in that it can cause overfitting of the data. Also mapping too many nodes potentially results in a loss of information as we are mapping too many objects of different types to the same dimension space. So we increase the grid size to see the change in the data and cluster. Most of the Nodes have upwards of 50 Genes mapped to it which creates a lot of generalization of the difference in the clusters.
+
+```{r}
+som_grid <- somgrid(xdim = 15, ydim = 15, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=1000)
+```
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 15, fig.width = 15}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+We now plot the SOM amd specify the cutoff point at a location where we can observe the approximate cutoff in the Dendrogram plotted above.
+
+By specifying the cutoff point obtained from the plot above and clustering the data at that height gives us the approximate distribution of the data into 3 clusters.
+
+```{r fig.height = 15, fig.width = 15}
+codes <- som_model$codes[[1]]
+d <- dist(codes)
+hc <- hclust(d)
+som_cluster <- cutree(hc,k=14)
+# plot these results:
+my_pal <- (hue_pal()(14))
+my_bhcol <- my_pal[som_cluster]
+
+{plot(som_model,type="mapping",col="black",bgcol = my_bhcol)
+  add.cluster.boundaries(som_model,som_cluster)}
+```
+
+```{r}
+show_col(my_pal)
+```
+
+From the counts plot we had inferred that there are upwards of 100 Genes that are plotted to a given node in SOM in that it can cause overfitting of the data. Also mapping too many nodes potentially results in a loss of information as we are mapping too many objects of different types to the same dimension space. Although the results improve a lot than the last grid size and the number of genes mapped have reduced. So we increase the grid size to see the change in the data and cluster. Most of the Nodes have upwards of 80 Genes mapped to it which creates a higher degree of generalization of the difference in the clusters.
+
+```{r}
+som_grid <- somgrid(xdim = 20, ydim=20, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=1000)
+```
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 15, fig.width = 15}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+We now plot the SOM amd specify the cutoff point at a location where we can observe the approximate cutoff in the Dendrogram plotted above.
+
+By specifying the cutoff point obtained from the plot above and clustering the data at that height gives us the approximate distribution of the data into 3 clusters.
+
+```{r fig.height = 15, fig.width = 15}
+codes <- som_model$codes[[1]]
+d <- dist(codes)
+hc <- hclust(d)
+som_cluster <- cutree(hc,k=14)
+# plot these results:
+my_pal <- (hue_pal()(14))
+my_bhcol <- my_pal[som_cluster]
+
+{plot(som_model,type="mapping",col="black",bgcol = my_bhcol)
+  add.cluster.boundaries(som_model,som_cluster)}
+```
+
+```{r}
+show_col(my_pal)
+```
+
+From the counts plot we had inferred that there are upwards of 70 Genes that are plotted to a given node in SOM in that it can cause overfitting of the data. Also mapping too many nodes potentially results in a loss of information as we are mapping too many objects of different types to the same dimension space. So we increase the grid size to see the change in the data and cluster. Most of the Nodes have upwards of 50 Genes mapped to it which creates a lot of generalization of the difference in the clusters.
+
+
+```{r}
+som_grid <- somgrid(xdim = 25, ydim=25, topo="hexagonal")
+som_model <- som(data_train_matrix,grid=som_grid,rlen=10000)
+```
+
+
+The counts lot gives us the count of the number of states map into the different units. 
+```{r fig.height = 15, fig.width = 15}
+plot(som_model,type="counts",palette.name=coolBlueHotRed)
+```
+
+We now plot the SOM amd specify the cutoff point at a location where we can observe the approximate cutoff in the Dendrogram plotted above.
+
+By specifying the cutoff point obtained from the plot above and clustering the data at that height gives us the approximate distribution of the data into 3 clusters.
+
+```{r fig.height = 15, fig.width = 15}
+codes <- som_model$codes[[1]]
+d <- dist(codes)
+hc <- hclust(d)
+som_cluster <- cutree(hc,k=14)
+# plot these results:
+my_pal <- (hue_pal()(14))
+my_bhcol <- my_pal[som_cluster]
+
+{plot(som_model,type="mapping",col="black",bgcol = my_bhcol)
+  add.cluster.boundaries(som_model,som_cluster)}
+```
+
+```{r}
+show_col(my_pal)
+```
+
+From the counts plot we had inferred that there are upwards of 50 Genes that are plotted to a given node in SOM.MOst of the nodes have 15-20 genes mapped to it which is a decent size for the cluster and also this is not a lot of nodes that could potentially over-generalize the results of the data.
+
+We now visualize the data that is mapped using SOM into a Heirarchical Cluster Map.
+We find the distance using the SOM_Model codes and observe a clear distinction between the height of the dendrogram between the 2 clusters. This helps us find the point for the cutoff and also helps us easily cluster the dat into 3 distinct groups which was difficult in the case of Plain Heirarchical Clustering using Eucledian Distance.
+
+```{r fig.height = 70, fig.width = 30}
+dend <- codes %>% dist %>%
+  hclust %>% as.dendrogram %>%
+  set("branches_k_color", k = 14) %>% set("branches_lwd", 0.7) %>%
+  set("labels_cex", 0.6) %>% set("labels_colors", k = 14) %>%
+  set("leaves_pch", 19) %>% set("leaves_cex", 0.5) 
+
+ggd1 <- as.ggdend(dend)
+ggplot(ggd1, horiz = TRUE)
+
+```
+
+This gives us the summary of the Self Organization Map.
+
+```{r}
+summary(som_model)
+```
+
+We now analyze the list of all the states and the prototypes that are closest to them.
+
+```{r}
+head(som_model$unit.classif)
+```
+
+We now analyze the relative changes of the prototype code book vectors as we proceed through 200 different iteration.
+
+```{r}
+head(som_model$changes)
+```
+
+We observe that the changes start decreasing as we start increasing the number of iterations. A better understanding can be obtained from the Graph which represents the changes in the prototype. The things start converging as we move in the iteration.
+
+```{r fig.height = 10, fig.width = 15}
+plot(som_model,type="changes",main="TUMOR MICRO ARRAY DATA")
+```
+
+We now plot the Codes plot which gives us the distribution of various crimes across various nodes.
+
+```{r fig.height = 20, fig.width = 15}
+plot(som_model,type = "codes")
+```
+
+
+We now plot the distance to the Neighbours between each states that are plotted into a particular node.
+
+```{r fig.height = 10, fig.width = 15}
+plot(som_model,type="dist.neighbours")
+```
+
+We now plot the componenet plane plots. Which Visualizes the original data over the SOM that we have created.
+
+```{r fig.height = 10, fig.width = 15}
+som_model$data <- data.frame(som_model$data)
+
+{for (i in 1:50){
+  plot(som_model, type = "property", property = codes[,i], main=names(som_model$data)[i],palette.name=coolBlueHotRed)
+  }}
+```
+
+
+
+
+

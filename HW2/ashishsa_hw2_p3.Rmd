@@ -1,0 +1,286 @@
+---
+title: "ashishsa_hw2_p3"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+my_data <- read.delim("seeds_dataset.txt",header = TRUE)
+head(my_data)
+```
+
+Here we observe that the data contains very large values in length for Area and Perimeter while the length of each attribute of the other data is very small in case of other variables. So we need to scale the data.
+Without scaling if we perform the distance function we get NaN values.
+```{r echo = FALSE}
+library(ggplot2)
+library(ggdendro)
+library(dplyr)
+library(dendextend)
+library(philentropy)
+library(cluster)
+library(RColorBrewer)
+library(ape)
+library(fossil)
+```
+
+We now scale the data
+```{r}
+m <- apply(my_data[,-8],2,mean)
+s <- apply(my_data[,-8],2,sd)
+z <- scale(my_data[,-8],m,s)
+```
+
+Calculate the Eucledian Distance.
+```{r fig.height = 10, fig.width = 15}
+distance1 <- dist(z,method = "euclidean")
+```
+
+##SINGLE LINKAGE
+
+We cluster the data using Single Linkage
+
+```{r fig.height = 10, fig.width = 15}
+hclust1 <- hclust(distance1,method="single")
+dend1 <- as.dendrogram(hclust1)
+dend1 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+Incase of Single Linkage of Heirarchical Clustering we observe that there are a large number of clusters.
+We find the Minimal Inter-Cluster Similarity which is used to calculate the inter-cluster similarity.
+We now plot the clusters using Fan-Plot.
+
+```{r}
+cutree1 <- cutree(dend1,3)
+cutree1
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust1), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree1],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+As we can observe from the fan plot most of thee data gets clustered into the same class.
+
+##AVERAGE LINKAGE
+
+We cluster the data using Average Linkage.
+
+```{r fig.height = 10, fig.width = 15}
+hclust2 <- hclust(distance1,method="average")
+dend2 <- as.dendrogram(hclust2)
+dend2 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+We compute Mean intercluster dissimilarity. Compute all pairwise dissimilarities between the observations in cluster A and the
+observations in cluster B, and record the average of these
+dissimilarities.
+
+```{r}
+cutree2 <- cutree(dend2,3)
+cutree2
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust2), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree2],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+As we can observe from the fan plot the data gets clustered into three classes.
+
+##COMPLETE LINKAGE
+
+We cluster the data using Complete Linkage.
+
+```{r fig.height = 10, fig.width = 15}
+hclust3 <- hclust(distance1,method="complete")
+dend3 <- as.dendrogram(hclust3)
+dend3 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+We compute Maximal intercluster dissimilarity. Compute all pairwise dissimilarities between the observations in cluster A and the
+observations in cluster B, and record the largest of these
+dissimilarities
+
+```{r}
+cutree3 <- cutree(dend3,3)
+cutree3
+```
+
+As we can observe from the fan plot the data gets clustered into three classes.
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust3), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree3],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+We use the Average silhouette plot to compare the performance of each of the above methods for various values of k for each of the clustering method.
+
+
+##ERROR RATES FOR VARIOUS METHODS OF HEIRARCHICAL CLUSTERING
+The plot that has the lowest error for the best k-value gives us the best result.
+
+```{r}
+store1 <- c()
+for (i in 2:10){
+  ct <- cutree(hclust1,k=i)
+  si <- silhouette(ct,dist = distance1)
+  avg_width <- summary(si)$avg.width
+  store1 <- c(store1,avg_width)
+}
+plot(store1)
+```
+
+```{r}
+store2 <- c()
+for (i in 2:10){
+  ct <- cutree(hclust2,k=i)
+  si <- silhouette(ct,dist = distance1)
+  avg_width <- summary(si)$avg.width
+  store2 <- c(store2,avg_width)
+}
+plot(store2)
+```
+
+```{r}
+library(ggplot2)
+store3 <- c()
+for (i in 2:10){
+  ct <- cutree(hclust3,k=i)
+  si <- silhouette(ct,dist = distance1)
+  avg_width <- summary(si)$avg.width
+  store3 <- c(store3,avg_width)
+}
+
+plot(store3)
+```
+
+From the above plots we can estimate that 
+
+1)complete linkage has the error of 0.35 for k=3( which is estimated to be best cluster size) 
+
+2)average linkage has the error of 0.30 for k=3( which is estimated to be best cluster size) 
+
+3)single linkage has the error of 0.1 for k=3( which is estimated to be best cluster size) 
+
+From the ablve observation we can conclude that Average and Complete has a better performance and alo they are preferred over single linkage as they give a balanced dendrogram.
+
+##K-MEANS
+Kmeans -- we complute the errors for various k values and then use the optimal k value to find the optimal k-size.  
+```{r}
+
+silhouette_score <- function(k){
+  km <- kmeans(z, centers = k, nstart=10)
+  ss <- silhouette(km$cluster, dist(z))
+  mean(ss[, 3])
+}
+k <- 2:10
+avg_sil <- sapply(k, silhouette_score)
+plot(k, type='b', avg_sil, xlab='Number of clusters', ylab='Average Silhouette Scores', frame=FALSE)
+
+```
+
+As it is difficult to find the optimum k size we use fviz_nbclust to find the right k.
+```{r}
+library(factoextra)
+
+fviz_nbclust(z, kmeans, method='silhouette')
+```
+
+We observe that the optimal number of cluster is obtained when k=2.
+
+```{r}
+ka2 <- kmeans(z,centers=3,nstart = 10)
+```
+
+we calculate rand index and adjusted rand index to calculate the accuracy.
+
+```{r}
+rand.index(ka2$cluster,as.numeric(my_data[,8]))
+```
+
+```{r}
+adj.rand.index(ka2$cluster,as.numeric(my_data[,8]))
+```
+The values of Rand and Adjusted Rand confirm that the optimal cluster size=3.
+
+```{r}
+clusplot(z, ka2$cluster, color=TRUE, shade=TRUE,
+   labels=2, lines=0)
+```
+
+##K-MENOIDS
+
+A medoid can be defined as the point in the cluster, whose dissimilarities with all the other points in the cluster is minimum.
+
+We initially find a good medoid size
+```{r}
+library(fpc)
+kmed <- pamk(z)
+kmed$nc
+```
+
+##K-MENOIDS-2-K
+```{r}
+table(kmed$pamobject$clustering,my_data$Seed.Group)
+```
+
+```{r}
+layout(matrix(c(1,2),1,2))
+plot(kmed$pamobject)
+```
+
+##K-MENOIDS-3-K
+
+```{r}
+library(fpc)
+kmed3 <- pamk(z,3)
+table(kmed3$pamobject$clustering,my_data$Seed.Group)
+```
+
+
+```{r}
+layout(matrix(c(1,2),1,2))
+plot(kmed3$pamobject)
+```
+
+```{r}
+library(bootcluster)
+k.select(z,range=2:6,B=50,r=5,scheme_2=TRUE)
+```
+
+```{r}
+k.select(z,range=2:6,B=50,r=5,scheme_2=FALSE)
+```
+
+```{r}
+gap_kmeans <- clusGap(z,kmeans,nstart=20,K.max=10,B=100)
+plot(gap_kmeans,main="Gap Statistics: K-Means")
+```
+
+```{r}
+gap_kmedoid <- clusGap(z,pam,K.max=10,B=100)
+plot(gap_kmedoid,main="Gap Statistics: K-Medoid")
+```
+
+From the above methods we can coclude that in the above problem K-Means perform better than Heirarchical Clustering

@@ -1,0 +1,168 @@
+---
+title: "ashishsa_hw2_p1"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+We take the USArrests Data and perform Heirarchical Clustering with complete linkage and eucledian distance to cluster the states.
+
+```{r}
+library(ISLR)
+data("USArrests") 
+df1 <- USArrests
+head(df1)
+```
+
+```{r}
+nrow(df1)
+```
+
+We observe that there are 4 columns(Murder, Assault, UrbanPop and Rape). There are 50 Rows here.
+
+```{r}
+pairs(df1)
+```
+
+We compute the Eucledian Distance between the data points and calculate the complete linkage for each of the points.
+
+```{r include=FALSE}
+library(philentropy)
+dist1 <- dist(df1,method="euclidean")
+
+hclust1 <- hclust(dist1,method="complete")
+```
+
+We use the ggplot package to plot the Dendrogram
+
+```{r message = FALSE}
+library(ggplot2)
+library(ggdendro)
+library(dplyr)
+library(dendextend)
+```
+
+
+```{r fig.height = 10, fig.width = 15}
+dend1 <- as.dendrogram(hclust1)
+dend1 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+We now cut the Dendrogram at a height which results in three distinct clusters. We also print which cluster each state belongs to.
+
+```{r}
+cutree1 <- cutree(dend1,3)
+cutree1
+```
+```{r}
+clust1_1 <- names(which(cutree1==1))
+clust1_2 <- names(which(cutree1==2))
+clust1_3 <- names(which(cutree1==3))
+```
+
+
+```{r}
+clust1_1
+```
+
+```{r}
+clust1_2
+```
+
+```{r}
+clust1_3
+```
+
+We can visualize this in the form of a coloured dendrogram as follows:
+
+```{r fig.height = 10, fig.width = 15}
+library(RColorBrewer)
+library(ape)
+plot(as.phylo(hclust1), type = "phylogram", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree1],
+      direction = "downwards", font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+Heirarchically cluster states using complete linkage and Eucledian distance after scaling the variables to have a standard deviation of 1.
+
+To scale the dataset we need to find the mean and the standard deviation. After finding the mean and standard deviation we subtract mean from each data point and then divide each data points with standard devaition.
+
+We check if there are any missing values in the dataset.
+```{r}
+is.na(df1)
+```
+
+Since there are no missing values in the dataset we donot need to consider missing values.
+
+The main reason to standardize the data is to remove the extreme values in a particular column. The extreme value may not necessarily be an outlier but may be intrinsically a part of the data.
+
+We now scale the data
+```{r}
+m <- apply(df1,2,mean)
+s <- apply(df1,2,sd)
+z <- scale(df1,m,s)
+```
+
+Now we apply the clustering function on this scaled dataset.
+
+```{r}
+dist3 <- dist(z,method="euclidean")
+
+hclust3 <- hclust(dist3,method="complete")
+```
+
+```{r fig.height = 10, fig.width = 15}
+dend3 <- as.dendrogram(hclust3)
+dend3 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+As we can observe here there is a shift in the position of the states in the dendrogram cluster. Also the Y-Axis now ranges between 0-6 rather than from 0-300.
+The Major reason behind scaling is as follows:
+
+If you compare states like NewYork and Washington with Alaska(Or Any Other Sparsely populated regions) we observe that even though the rate of crime might be less but it is unfair. As States like NewYork or Washington are much more densely populated and the per person crime rate is much lower than Alaska. And also in certain Datasets this disparity in the data results in Unfair or Unequal Clustering. This Issue is handled by standardizing the datasets.
+
+We can take another Example where we are calculating the income in a particular country we observe that most of the data gets clustered in the top 10% highest earning group of the dataset even though there are very few people earning so high and most of the people earn very less but during clustering the data can get skewered. Although this didnot contain bad data necessarily but the effect of very high or low values effect the clustering mechanism.
+
+We now check the effect of cutting the dendrogram into 3 clusters as follows
+
+```{r}
+cutree2 <- cutree(dend3,3)
+cutree2
+```
+
+We can visualize this in the form of a coloured dendrogram as follows:
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust3), type = "phylogram", cex = 0.6,
+     tip.color = brewer.pal(3, 'Accent')[cutree2],
+      direction = "downwards", font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+```{r}
+clust2_1 <- names(which(cutree2==1))
+clust2_2 <- names(which(cutree2==2))
+clust2_3 <- names(which(cutree2==3))
+```
+
+
+```{r}
+clust2_1
+```
+
+```{r}
+clust2_2
+```
+
+```{r}
+clust2_3
+```
+
+We observe that scaling the dataset results in shift in the number of clusters. Also there is a shift in the classification of states in various dendrograms. This occurs as there might be different units of measurements accross different variables or as the dataset might be distributed assymetrically.

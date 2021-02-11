@@ -1,0 +1,227 @@
+---
+title: "ashishsa_hw2_p2"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load the dataset.
+```{r}
+df1 <- read.csv("Ch10Ex11.csv", header = FALSE)
+head(df1)
+```
+
+```{r}
+nrow(df1)
+```
+```{r}
+ncol(df1)
+```
+
+We observe that there is 1000 Rows and 40 Columns. Also we observe that as this is a Genomic Dataset and the general structure as observed from head tells us that the general method of distance like Eucledian Distance or Manhatten Distance is unsuitable for calculating the Uncertanity in the dataset since the dataset contains Negative Values.
+So we use the Correlation Coefficient to calculate the Uncertanity between the data points.
+
+```{r}
+distance1 <- dist(cor(df1))
+```
+
+We now plot the dendrogram by using various types of linkages ad compare the results of Single, Complete, Average  and Centroid Based Linkage Methods and check the results for each of these methods.
+
+We use the ggplot package to plot the Dendrogram.
+
+```{r message = FALSE}
+library(philentropy)
+library(ggplot2)
+library(ggdendro)
+library(dplyr)
+library(dendextend)
+```
+
+
+```{r fig.height = 10, fig.width = 15}
+hclust1 <- hclust(distance1,method="single")
+dend1 <- as.dendrogram(hclust1)
+dend1 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+```{r fig.height = 10, fig.width = 15}
+library(corrplot)
+
+corrplot(cor(df1),method='color',order="hclust",hclust.method = 'single',tl.col = 'black', tl.cex = 0.7)
+```
+
+```{r fig.height = 10, fig.width = 15}
+hclust2 <- hclust(distance1,method="complete")
+dend2 <- as.dendrogram(hclust2)
+dend2 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+```{r fig.height = 10, fig.width = 15}
+corrplot(cor(df1),method='color',order="hclust",hclust.method = 'complete',tl.col = 'black', tl.cex = 0.7)
+```
+
+
+```{r fig.height = 10, fig.width = 15}
+hclust3 <- hclust(distance1,method="average")
+dend3 <- as.dendrogram(hclust3)
+dend3 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+```{r fig.height = 10, fig.width = 15}
+corrplot(cor(df1),method='color',order="hclust",hclust.method = 'average',tl.col = 'black', tl.cex = 0.7)
+```
+
+
+
+```{r fig.height = 10, fig.width = 15}
+hclust4 <- hclust(distance1,method="centroid")
+dend4 <- as.dendrogram(hclust4)
+dend4 %>% set("branches_k_color") %>% 
+  plot(main = "Default colors") %>%
+  axis(side = 2,col = "#F38630",labels = TRUE) %>%
+  mtext(col = "#A38630")
+```
+
+
+```{r fig.height = 10, fig.width = 15}
+corrplot(cor(df1),method='color',order="hclust",hclust.method = 'centroid',tl.col = 'black', tl.cex = 0.7)
+```
+
+
+From the Visual Observation we observe that the Dataset is divided into 2 groups. So we divide the dataset into two groups.
+
+```{r}
+cutree1 <- cutree(dend1,2)
+cutree1
+```
+
+```{r fig.height = 10, fig.width = 15}
+library(RColorBrewer)
+library(ape)
+plot(as.phylo(hclust1), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree1],
+     font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+```{r}
+cutree2 <- cutree(dend2,2)
+cutree2
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust2), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree2],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+
+```{r}
+cutree3 <- cutree(dend3,2)
+cutree3
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust3), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree3],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+
+```{r}
+cutree4 <- cutree(dend4,2)
+cutree4
+```
+
+```{r fig.height = 10, fig.width = 15}
+plot(as.phylo(hclust4), type = "fan", cex = 0.6,
+    tip.color = brewer.pal(3, 'Accent')[cutree4],
+      font = 2,
+     edge.color = 'steelblue', edge.width = 2, edge.lty = 2)
+```
+
+We observe from the Fan plot and Also from the summary of each of the cutree of the dendrograms of various types of linkage methods used that the objects get classified based on the type of the linkage methods used such as Single, Complete,Centroid and Average.
+Incase of Average Linkage we observe a dramatic result where in all the data points get clustered in to the same cluster. While in case of other clusters there is a partition of the Principle space into 2 clusters but the size of each of these clusters vary.
+
+
+In order to check which variables differ the most between Healthy and Diseased Patient we perform:
+
+1)Principle Component Analysis on the dataset
+
+2)K-Means Clustering
+
+```{r}
+library(factoextra)
+pcomp_df <- prcomp(t(df1))
+```
+
+We observe the percentage of variance by each principal component.
+
+```{r fig.height = 10, fig.width = 15}
+fviz_eig(pcomp_df)
+```
+
+We Also map how the various Genes are mapped across the componenet space and this helps us visualize the clusters.
+
+```{r fig.height = 10, fig.width = 15}
+fviz_pca_ind(pcomp_df,
+             col.ind = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE 
+             )
+```
+
+This plot helps us visualize how positively correlated points are mapped to the same side of the component space and the negatively correlated points are mapped to the opposite side of the component space.
+```{r fig.height = 10, fig.width = 15}
+fviz_pca_var(pcomp_df,
+             col.var = "contrib", 
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     
+             )
+```
+
+Biplot of the Genes
+```{r fig.height = 10, fig.width = 15}
+fviz_pca_biplot(pcomp_df, repel = TRUE,
+                col.var = "#2E9FDF", 
+                col.ind = "#696969"  
+                )
+```
+`
+After observing the PCA Results in these visualization we use K-Means Clustering to divide each of the 2 principle components into its corresponding cluster.
+```{r}
+individual_coord <- pcomp_df$x[, 1:2]
+k2 <- kmeans(individual_coord, centers = 2,nstart=10)
+
+```
+
+```{r fig.height = 10, fig.width = 15}
+library(cluster)
+clusplot(individual_coord, k2$cluster, color=TRUE, shade=TRUE,
+   labels=2, lines=0)
+
+```
+
+
+```{r}
+total <- apply(pcomp_df$x, 1, sum)
+top <- order(abs(total), decreasing = TRUE)
+top[1:10]
+```
+
+These are the Genes that differ the most accross the two groups.

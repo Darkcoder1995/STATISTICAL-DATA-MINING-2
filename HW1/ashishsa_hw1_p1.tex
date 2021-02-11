@@ -1,0 +1,516 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={ashishsa\_hw\_p1},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{ashishsa\_hw\_p1}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+We initially consider the following Utility Matrix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(knitr)}
+\NormalTok{a <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\NormalTok{b <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{c <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{d <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{e <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{f <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{)}
+\NormalTok{g <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)}
+\NormalTok{h <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{df <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(a,b,c,d,e,f,g,h)}
+\end{Highlighting}
+\end{Shaded}
+
+Here we represent the missing values with NA.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    a  b  c d  e  f g  h
+## 1  4  5 NA 5  1 NA 3  2
+## 2 NA  3  4 3  1  2 1 NA
+## 3  2 NA  1 3 NA  4 5  3
+\end{verbatim}
+
+We now rename the rows in R.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{rownames}\NormalTok{(df) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'A'}\NormalTok{,}\StringTok{'B'}\NormalTok{,}\StringTok{'C'}\NormalTok{)}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    a  b  c d  e  f g  h
+## A  4  5 NA 5  1 NA 3  2
+## B NA  3  4 3  1  2 1 NA
+## C  2 NA  1 3 NA  4 5  3
+\end{verbatim}
+
+We now need to calculate the Jacard and cosine distance between users by
+considering the utility matrix as Boolean. So Initially we convert the
+utility matrix into Boolean
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df[df}\OperatorTok{>}\DecValTok{0}\NormalTok{] <-}\StringTok{ }\DecValTok{1}
+\NormalTok{df[df}\OperatorTok{<=}\DecValTok{0}\NormalTok{] <-}\StringTok{ }\DecValTok{0}
+\NormalTok{df[}\KeywordTok{is.na}\NormalTok{(df)] <-}\StringTok{ }\DecValTok{0}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   a b c d e f g h
+## A 1 1 0 1 1 0 1 1
+## B 0 1 1 1 1 1 1 0
+## C 1 0 1 1 0 1 1 1
+\end{verbatim}
+
+We have now converted the Utility Matrix into Binary Utility Matrix. Now
+we calculate the Jackard Distance.
+
+\#\#JACCARD DISTANCE
+
+This can Manually be calculated as:
+
+The Jaccard Index (between any two columns/users of the matrix M) is
+a/a+b+c, where:
+
+a = number of rows where both columns are 1
+
+b = number of rows where the first row is 0 and the other row is 1
+
+c = number of rows where the first row is 1 and the other row is 0
+
+Now we calculate the Jaccard distance between (A,B) and (A,C):
+
+Jaccard Distance between A,B:
+
+a=4
+
+b=2
+
+c=2
+
+J\_AB={[}4/(4+2+2){]}
+
+J\_AB={[}1/2{]}
+
+Jaccard Distance between A,C:
+
+a=4
+
+b=2
+
+c=2
+
+J\_AC={[}4/(4+2+2){]}
+
+J\_AC={[}1/2{]}
+
+\#\#COSINE DISTANCE
+
+COSINE DISTANCE=1-COSINE SIMILARITY
+
+COSINE
+SIMILARITY=(A.B)/\textbar\textbar A\textbar\textbar.\textbar\textbar B\textbar\textbar{}
+
+\#\#Cosine Distance between A,B:
+
+A.B= (1\emph{0)+(1}1)+(0\emph{1)+(1}1)+(1\emph{1)+(0}1)+(1\emph{1)+(1}0)
+
+A.B=(0+1+0+1+1+0+1+0)
+
+A.B=4
+
+\textbar\textbar A\textbar\textbar=(1\emph{1)+(1}1)+(0\emph{0)+(1}1)+(1\emph{1)+(0}0)+(1\emph{1)+(1}1)
+
+\textbar\textbar A\textbar\textbar=6
+
+\textbar\textbar B\textbar\textbar=(0\emph{0)+(1}1)+(1\emph{1)+(1}1)+(1\emph{1)+(1}1)+(1\emph{1)+(0}0)
+
+\textbar\textbar B\textbar\textbar=6
+
+COSINE SIMILARITY=4/(6*6)
+
+COSINE SIMILARITY=4/36
+
+COSINE DISTANCE=1-(4/36)
+
+COSINE DISTANCE==32/36
+
+\#\#Cosine Distance between A,C:
+
+A.C= (1\emph{1)+(1}0)+(0\emph{1)+(1}1)+(1\emph{0)+(0}1)+(1\emph{1)+(1}1)
+
+A.C=(1+0+0+1+0+0+1+1)
+
+A.C=4
+
+\textbar\textbar A\textbar\textbar=(1\emph{1)+(1}1)+(0\emph{0)+(1}1)+(1\emph{1)+(0}0)+(1\emph{1)+(1}1)
+
+\textbar\textbar A\textbar\textbar=6
+
+\textbar\textbar C\textbar\textbar=(1\emph{1)+(0}0)+(1\emph{1)+(1}1)+(0\emph{0)+(1}1)+(1\emph{1)+(1}1)
+
+\textbar\textbar C\textbar\textbar=6
+
+COSINE SIMILARITY=4/(6*6)
+
+COSINE SIMILARITY=4/36
+
+COSINE DISTANCE=1-(4/36)
+
+COSINE DISTANCE==32/36
+
+\#\#Now we consider that 3,4,5 are 1 and 1,2 are 0:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(knitr)}
+\NormalTok{a <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\NormalTok{b <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{c <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{d <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{e <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{f <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{)}
+\NormalTok{g <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)}
+\NormalTok{h <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{df <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(a,b,c,d,e,f,g,h)}
+\NormalTok{df[df}\OperatorTok{<=}\DecValTok{2}\NormalTok{] <-}\StringTok{ }\DecValTok{0}
+\NormalTok{df[df}\OperatorTok{>=}\DecValTok{3}\NormalTok{] <-}\StringTok{ }\DecValTok{1}
+\NormalTok{df[}\KeywordTok{is.na}\NormalTok{(df)] <-}\StringTok{ }\DecValTok{0}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   a b c d e f g h
+## 1 1 1 0 1 0 0 1 0
+## 2 0 1 1 1 0 0 0 0
+## 3 0 0 0 1 0 1 1 1
+\end{verbatim}
+
+We have now converted the Utility Matrix into Binary Utility Matrix. Now
+we calculate the Jackard Distance.
+
+\#\#JACCARD DISTANCE
+
+This can Manually be calculated as: The Jaccard Index (between any two
+columns/users of the matrix M) is a/a+b+c, where:
+
+a = number of rows where both columns are 1
+
+b = number of rows where the first row is 0 and the other row is 1
+
+c = number of rows where the first row is 1 and the other row is 0
+
+Now we calculate the Jaccard distance between (A,B) and (A,C):
+
+Jaccard Distance between A,B:
+
+a=2
+
+b=1
+
+c=2
+
+J\_AB={[}2/(2+1+2){]}
+
+J\_AB={[}2/5{]}
+
+Jaccard Distance between A,C:
+
+a=2
+
+b=2
+
+c=2
+
+J\_AC={[}2/(2+2+2){]}
+
+J\_AC={[}2/6{]} \#\#COSINE DISTANCE
+
+COSINE DISTANCE=1-COSINE SIMILARITY
+
+COSINE
+SIMILARITY=(A.B)/\textbar\textbar A\textbar\textbar.\textbar\textbar B\textbar\textbar{}
+
+\#\#Cosine Distance between A,B: A.B=
+(1\emph{0)+(1}1)+(0\emph{1)+(1}1)+(0\emph{0)+(0}0)+(1\emph{0)+(0}0)
+
+A.B=(0+1+0+1+0+0+0+0)
+
+A.B=2
+
+\textbar\textbar A\textbar\textbar=(1\emph{1)+(1}1)+(0\emph{0)+(1}1)+(0\emph{0)+(0}0)+(1\emph{1)+(0}0)
+
+\textbar\textbar A\textbar\textbar=4
+
+\textbar\textbar B\textbar\textbar=(0\emph{0)+(1}1)+(1\emph{1)+(1}1)+(0\emph{0)+(0}0)+(0\emph{0)+(0}0)
+
+\textbar\textbar B\textbar\textbar=3
+
+COSINE SIMILARITY=2/(4*3)
+
+COSINE SIMILARITY=2/12
+
+COSINE DISTANCE=1-(2/12)
+
+COSINE DISTANCE==10/12
+
+\#\#Cosine Distance between A,C: A.C=
+(1\emph{0)+(1}0)+(0\emph{0)+(1}1)+(0\emph{0)+(0}1)+(1\emph{1)+(0}1)
+
+A.C=(0+0+0+1+0+0+1+0)
+
+A.C=2
+
+\textbar\textbar A\textbar\textbar=(1\emph{1)+(1}1)+(0\emph{0)+(1}1)+(0\emph{0)+(0}0)+(1\emph{1)+(0}0)
+
+\textbar\textbar A\textbar\textbar=4
+
+\textbar\textbar C\textbar\textbar=(0\emph{0)+(0}0)+(0\emph{0)+(1}1)+(0\emph{0)+(1}1)+(1\emph{1)+(1}1)
+
+\textbar\textbar C\textbar\textbar=4
+
+COSINE SIMILARITY=2/(4*4)
+
+COSINE SIMILARITY=2/16
+
+COSINE DISTANCE=1-(2/16)
+
+COSINE DISTANCE==14/16
+
+Normalize the matrix by subtracting from each nonblank entry the average
+value for its user. Using this matrix, compute the cosine distance
+between each pair of users.
+
+We initially consider the following Utility Matrix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(knitr)}
+\NormalTok{a <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\NormalTok{b <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{c <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{d <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{e <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{f <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{)}
+\NormalTok{g <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{)}
+\NormalTok{h <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+\NormalTok{df <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(a,b,c,d,e,f,g,h)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{1}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\NormalTok{B <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{C <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{3}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+
+\NormalTok{mean_A <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(A,}\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{mean_A}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3.333333
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mean_B <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(B,}\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{mean_B}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2.333333
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mean_C <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(C,}\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{mean_C}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+
+Now substracting mean from every value in df we get:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{2}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{0}\NormalTok{,}\OperatorTok{-}\DecValTok{1}\NormalTok{)}
+\NormalTok{B <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{,}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{,}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OtherTok{NA}\NormalTok{)}
+\NormalTok{C <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\OperatorTok{-}\DecValTok{2}\NormalTok{,}\DecValTok{0}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#COSINE DISTANCE
+
+COSINE DISTANCE=1-COSINE SIMILARITY
+
+COSINE
+SIMILARITY=(A.B)/\textbar\textbar A\textbar\textbar.\textbar\textbar B\textbar\textbar{}
+
+we consider na as 0 \#\#Cosine Distance between A,B:
+
+A.B=
+(1\emph{0)+(2}1)+(0\emph{2)+(2}1)+(-2\emph{-1)+(0}0)+(0\emph{-1)+(-1}0)
+
+A.B=(0+2+0+2+2+0+0+0)
+
+A.B=6
+
+\textbar\textbar A\textbar\textbar=(1\emph{1)+(2}2)+(0\emph{0)+(2}2)+(-2\emph{-2)+(0}0)+(0\emph{0)+(-1}-1)
+
+\textbar\textbar A\textbar\textbar=14
+
+\textbar\textbar B\textbar\textbar=(0\emph{0)+(1}1)+(2\emph{2)+(1}1)+(-1\emph{-1)+(0}0)+(-1\emph{-1)+(0}0)
+
+\textbar\textbar B\textbar\textbar=8
+
+COSINE SIMILARITY=6/(14*8)
+
+COSINE SIMILARITY=2/112
+
+COSINE DISTANCE=1-(2/112)
+
+COSINE DISTANCE==110/112
+
+\#\#Cosine Distance between A,C: A.C=
+(1\emph{0)+(1}0)+(0\emph{0)+(1}1)+(0\emph{0)+(0}1)+(1\emph{1)+(0}1)
+
+A.C=(0+0+0+1+0+0+1+0)
+
+A.C=2
+
+\textbar\textbar A\textbar\textbar=(1\emph{1)+(2}2)+(0\emph{0)+(2}2)+(-2\emph{-2)+(0}0)+(0\emph{0)+(-1}-1)
+
+\textbar\textbar A\textbar\textbar=14
+
+\textbar\textbar C\textbar\textbar=(-1\emph{-1)+(0}0)+(-2\emph{-2)+(0}0)+(0\emph{0)+(1}1)+(2\emph{2)+(0}0)
+
+\textbar\textbar C\textbar\textbar=10
+
+COSINE SIMILARITY=2/(14*10)
+
+COSINE SIMILARITY=2/140
+
+COSINE DISTANCE=1-(2/140)
+
+COSINE DISTANCE==138/140
+
+\end{document}
